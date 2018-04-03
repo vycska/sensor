@@ -1,13 +1,11 @@
-__stack_size = 512;
+__stack_size = 256;
 
 ENTRY(Reset_Handler)
 
 MEMORY
 {
-	rom(rx)	: ORIGIN = 0x00000000, LENGTH = 512K
-	ram(rw)	: ORIGIN = 0x10000000, LENGTH = 32K
-        ram1(rw) : ORIGIN = 0x2007c000, LENGTH = 16K
-        ram2(rw) : ORIGIN = 0x20080000, LENGTH = 16K
+	flash(rx) : ORIGIN = 0x00000000, LENGTH = 32K
+	ram(rw)   : ORIGIN = 0x10000000, LENGTH = 8K
 }
 
 SECTIONS
@@ -17,7 +15,7 @@ SECTIONS
 		KEEP(*(.intvecs))
 		. = ALIGN(0x10);
 		_intvecs_end = .;
-	} > rom = 0xaaaaaaaa
+	} > flash = 0xaaaaaaaa
 	
 	.text : {
 		_text_start = .;
@@ -25,14 +23,14 @@ SECTIONS
 		LONG (0xbbbbbbbb);
 		. = ALIGN(0x10);
 		_text_end = .;
-	} > rom = 0xcccccccc
+	} > flash = 0xcccccccc
 
 	.rodata : {
 		_rodata_start = .;
 		*(.rodata*)
 		. = ALIGN(0x10);
 		_rodata_end = .;
-	} > rom = 0xdddddddd
+	} > flash = 0xdddddddd
 
 	.stack (NOLOAD) : {
 		_stack_start = .;
@@ -45,10 +43,10 @@ SECTIONS
 		_data_start = .;
 		*(.data*)
 		_data_end = .;
-	} > ram AT>rom /* nurodom kad sita sekcija bus patalpinta i rom */
+	} > ram AT>flash
 
 	.bss (NOLOAD) :{
-		_bss_start = .; /* these symbols hold vma addresses */
+		_bss_start = .;
 		*(.bss*)
 		*(COMMON*)
 		_bss_end = .;
@@ -60,14 +58,6 @@ SECTIONS
 		. = ORIGIN(ram) + LENGTH(ram);
 		_heap_end = .;
 	} > ram
-
-	/*
-	.heap ORIGIN(ram) + LENGTH(ram) - 32 - __heap_size (NOLOAD) : {
-		_heap_start = .
-		. += __heap_size;
-		_heap_end = .;
-	}
-	*/
 
 	_data_start_lma = LOADADDR (.data);
 	_intvecs_size = SIZEOF (.intvecs);
