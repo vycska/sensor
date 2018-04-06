@@ -13,7 +13,7 @@ COBJS := $(addprefix objs/,$(CSRCS:.c=.o))
 
 ASFLAGS := -Wa,--warn -Wa,--fatal-warnings
 CPPFLAGS := -I inc -I /usr/arm-none-eabi/include
-CFLAGS := -march=armv6-m -mcpu=cortex-m0plus -mthumb -mfloat-abi=soft -mlittle-endian -ffreestanding -fsigned-char -fdata-sections -ffunction-sections -O0 -Wall -Werror
+CFLAGS := -march=armv6-m -mcpu=cortex-m0plus -mthumb -mfloat-abi=soft -mlittle-endian -ffreestanding -fsigned-char -fdata-sections -ffunction-sections -O1 -Wall -Werror
 LDFLAGS := -nostdlib -nostartfiles -nodefaultlibs -Llibs -L/usr/arm-none-eabi/lib/armv6-m -L/usr/lib/gcc/arm-none-eabi/7.3.0/armv6-m -T $(TARGET).ld -Wl,-Map=$(TARGET).map -Wl,--cref -Wl,--gc-sections
 LDLIBS := -lgcc -lc_nano -lnosys -lm
 

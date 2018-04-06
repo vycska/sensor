@@ -1,7 +1,13 @@
+#include "pll.h"
+#include "lpc824.h"
+
 extern char _data_start_lma, _data_start, _data_end, _bss_start, _bss_end;
 
 void main(void) {
    int i;
+
+   //PLL_Init();
+
    while(1) {
       for(i=0;i<1000000;i++);
    }
