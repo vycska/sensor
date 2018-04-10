@@ -3,36 +3,56 @@
 
 #include <stdint.h>
 
+//MRT
+#define INTVAL0                        (*((volatile uint32_t*)0x40004000)) //MRT0 time interval value (loaded into the TIMER0 register)
+#define TIMER0                         (*((volatile uint32_t*)0x40004004)) //MRT0 timer register (reads the value of the down counter)
+#define CTRL0                          (*((volatile uint32_t*)0x40004008)) //MRT0 control register (controls the MRT0 modes)
+#define STAT0                          (*((volatile uint32_t*)0x4000400c)) //MRT0 status register
+#define INTVAL1                        (*((volatile uint32_t*)0x40004010)) //MRT1 timer interval value (loaded into the TIMER1 register)
+#define TIMER1                         (*((volatile uint32_t*)0x40004014)) //MRT1 timer register (reads the value of the down counter)
+#define CTRL1                          (*((volatile uint32_t*)0x40004018)) //MRT1 control register (controls the MRT1 modes)
+#define STAT1                          (*((volatile uint32_t*)0x4000401c)) //MRT1 status register
+#define INTVAL2                        (*((volatile uint32_t*)0x40004020)) //MRT2 timer interval value (loaded into the TIMER2 register)
+#define TIMER2                         (*((volatile uint32_t*)0x40004024)) //MRT2 timer register (reads the value of the down counter)
+#define CTRL2                          (*((volatile uint32_t*)0x40004028)) //MRT2 control register (controls the MRT2 modes)
+#define STAT2                          (*((volatile uint32_t*)0x4000402c)) //MRT2 status register
+#define INTVAL3                        (*((volatile uint32_t*)0x40004030)) //MRT3 timer interval value (loaded into the TIMER3 register)
+#define TIMER3                         (*((volatile uint32_t*)0x40004034)) //MRT3 timer register (reads the value of the down counter)
+#define CTRL3                          (*((volatile uint32_t*)0x40004038)) //MRT3 control register (controls the MRT3 modes)
+#define STAT3                          (*((volatile uint32_t*)0x4000403c)) //MRT3 status register
+#define IDLE_CH                        (*((volatile uint32_t*)0x400040f4)) //idle channel register (returns the number of the first idle)
+#define IRQ_FLAG                       (*((volatile uint32_t*)0x400040f8)) //global interrupt flag register
+
 // I/O configuration
 #define PIO0_17                        (*((volatile uint32_t*)0x40044000)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_13                        (*((volatile uint32_t*)0x40044004)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_12                        (*((volatile uint32_t*)0x40044008)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_5                         (*((volatile uint32_t*)0x4004400c)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_4                         (*((volatile uint32_t*)0x40044010)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_3                         (*((volatile uint32_t*)0x40044014)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_2                         (*((volatile uint32_t*)0x40044018)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_11                        (*((volatile uint32_t*)0x4004401c)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_10                        (*((volatile uint32_t*)0x40044020)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_16                        (*((volatile uint32_t*)0x40044024)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_15                        (*((volatile uint32_t*)0x40044028)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_1                         (*((volatile uint32_t*)0x4004402c)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_9                         (*((volatile uint32_t*)0x40044034)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_8                         (*((volatile uint32_t*)0x40044038)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_7                         (*((volatile uint32_t*)0x4004403c)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_6                         (*((volatile uint32_t*)0x40044040)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_0                         (*((volatile uint32_t*)0x40044044)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_14                        (*((volatile uint32_t*)0x40044048)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_28                        (*((volatile uint32_t*)0x40044050)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_27                        (*((volatile uint32_t*)0x40044054)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_26                        (*((volatile uint32_t*)0x40044058)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_25                        (*((volatile uint32_t*)0x4004405c)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_24                        (*((volatile uint32_t*)0x40044060)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_23                        (*((volatile uint32_t*)0x40044064)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_22                        (*((volatile uint32_t*)0x40044068)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_21                        (*((volatile uint32_t*)0x4004406c)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_20                        (*((volatile uint32_t*)0x40044070)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_19                        (*((volatile uint32_t*)0x40044074)) //I/O configuration for pin PIO0_17/ADC_9
-#define PIO0_18                        (*((volatile uint32_t*)0x40044078)) //I/O configuration for pin PIO0_17/ADC_9
+#define PIO0_13                        (*((volatile uint32_t*)0x40044004)) //I/O configuration for pin PIO0_13/ADC_10
+#define PIO0_12                        (*((volatile uint32_t*)0x40044008)) //I/O configuration for pin PIO0_12
+#define PIO0_5                         (*((volatile uint32_t*)0x4004400c)) //I/O configuration for pin PIO0_5/RESET
+#define PIO0_4                         (*((volatile uint32_t*)0x40044010)) //I/O configuration for pin PIO0_4/ADC_11/TRSTN/WAKEUP
+#define PIO0_3                         (*((volatile uint32_t*)0x40044014)) //I/O configuration for pin PIO0_3/SWCLK
+#define PIO0_2                         (*((volatile uint32_t*)0x40044018)) //I/O configuration for pin PIO0_2/SWDIO
+#define PIO0_11                        (*((volatile uint32_t*)0x4004401c)) //I/O configuration for pin PIO0_11 (for the true OD pin)
+#define PIO0_10                        (*((volatile uint32_t*)0x40044020)) //I/O configuration for pin PIO0_10 (for the true OD pin)
+#define PIO0_16                        (*((volatile uint32_t*)0x40044024)) //I/O configuration for pin PIO0_16
+#define PIO0_15                        (*((volatile uint32_t*)0x40044028)) //I/O configuration for pin PIO0_15
+#define PIO0_1                         (*((volatile uint32_t*)0x4004402c)) //I/O configuration for pin PIO0_1/ACMP_I1/CLKIN
+#define PIO0_9                         (*((volatile uint32_t*)0x40044034)) //I/O configuration for pin PIO0_9/XTALOUT
+#define PIO0_8                         (*((volatile uint32_t*)0x40044038)) //I/O configuration for pin PIO0_8/XTALIN
+#define PIO0_7                         (*((volatile uint32_t*)0x4004403c)) //I/O configuration for pin PIO0_7/ADC_0
+#define PIO0_6                         (*((volatile uint32_t*)0x40044040)) //I/O configuration for pin PIO0_6/ADC_1/VDDCMP
+#define PIO0_0                         (*((volatile uint32_t*)0x40044044)) //I/O configuration for pin PIO0_0/ACMP_I0
+#define PIO0_14                        (*((volatile uint32_t*)0x40044048)) //I/O configuration for pin PIO0_14/ACMP_I3/ADC_2
+#define PIO0_28                        (*((volatile uint32_t*)0x40044050)) //I/O configuration for pin PIO0_28
+#define PIO0_27                        (*((volatile uint32_t*)0x40044054)) //I/O configuration for pin PIO0_27
+#define PIO0_26                        (*((volatile uint32_t*)0x40044058)) //I/O configuration for pin PIO0_26
+#define PIO0_25                        (*((volatile uint32_t*)0x4004405c)) //I/O configuration for pin PIO0_25
+#define PIO0_24                        (*((volatile uint32_t*)0x40044060)) //I/O configuration for pin PIO0_24
+#define PIO0_23                        (*((volatile uint32_t*)0x40044064)) //I/O configuration for pin PIO0_23/ADC_3/ACMP_I4
+#define PIO0_22                        (*((volatile uint32_t*)0x40044068)) //I/O configuration for pin PIO0_22/ADC_4
+#define PIO0_21                        (*((volatile uint32_t*)0x4004406c)) //I/O configuration for pin PIO0_21/ADC_5
+#define PIO0_20                        (*((volatile uint32_t*)0x40044070)) //I/O configuration for pin PIO0_20/ADC_6
+#define PIO0_19                        (*((volatile uint32_t*)0x40044074)) //I/O configuration for pin PIO0_19/ADC_7
+#define PIO0_18                        (*((volatile uint32_t*)0x40044078)) //I/O configuration for pin PIO0_18/ADC_8
 
 // system configuration
 #define SYSMEMREMAP                    (*((volatile uint32_t*)0x40048000)) //system memory remap
@@ -97,6 +117,82 @@
 #define PINASSIGN10                    (*((volatile uint32_t*)0x4000c028)) //pin assign register 10
 #define PINASSIGN11                    (*((volatile uint32_t*)0x4000c02c)) //pin assign register 11
 #define PINENABLE0                     (*((volatile uint32_t*)0x4000c1c0)) //pin enable register
+
+//GPIO port
+#define B0                             (*((volatile uint8_t*)0xa0000000)) //byte pin registers port 0; pins PIO0_0 to PIO0_28
+#define B1                             (*((volatile uint8_t*)0xa0000001))
+#define B2                             (*((volatile uint8_t*)0xa0000002))
+#define B3                             (*((volatile uint8_t*)0xa0000003))
+#define B4                             (*((volatile uint8_t*)0xa0000004))
+#define B5                             (*((volatile uint8_t*)0xa0000005))
+#define B6                             (*((volatile uint8_t*)0xa0000006))
+#define B7                             (*((volatile uint8_t*)0xa0000007))
+#define B8                             (*((volatile uint8_t*)0xa0000008))
+#define B9                             (*((volatile uint8_t*)0xa0000009))
+#define B10                            (*((volatile uint8_t*)0xa000000a))
+#define B11                            (*((volatile uint8_t*)0xa000000b))
+#define B12                            (*((volatile uint8_t*)0xa000000c))
+#define B13                            (*((volatile uint8_t*)0xa000000d))
+#define B14                            (*((volatile uint8_t*)0xa000000e))
+#define B15                            (*((volatile uint8_t*)0xa000000f))
+#define B16                            (*((volatile uint8_t*)0xa0000010))
+#define B17                            (*((volatile uint8_t*)0xa0000011))
+#define B18                            (*((volatile uint8_t*)0xa0000012))
+#define B19                            (*((volatile uint8_t*)0xa0000013))
+#define B20                            (*((volatile uint8_t*)0xa0000014))
+#define B21                            (*((volatile uint8_t*)0xa0000015))
+#define B22                            (*((volatile uint8_t*)0xa0000016))
+#define B23                            (*((volatile uint8_t*)0xa0000017))
+#define B24                            (*((volatile uint8_t*)0xa0000018))
+#define B25                            (*((volatile uint8_t*)0xa0000019))
+#define B26                            (*((volatile uint8_t*)0xa000001a))
+#define B27                            (*((volatile uint8_t*)0xa000001b))
+#define B28                            (*((volatile uint8_t*)0xa000001c))
+#define W0                             (*((volatile uint32_t*)0xa0001000)) //word pin registers port 0
+#define W1                             (*((volatile uint32_t*)0xa0001004))
+#define W2                             (*((volatile uint32_t*)0xa0001008))
+#define W3                             (*((volatile uint32_t*)0xa000100c))
+#define W4                             (*((volatile uint32_t*)0xa0001010))
+#define W5                             (*((volatile uint32_t*)0xa0001014))
+#define W6                             (*((volatile uint32_t*)0xa0001018))
+#define W7                             (*((volatile uint32_t*)0xa000101c))
+#define W8                             (*((volatile uint32_t*)0xa0001020))
+#define W9                             (*((volatile uint32_t*)0xa0001024))
+#define W10                            (*((volatile uint32_t*)0xa0001028))
+#define W11                            (*((volatile uint32_t*)0xa000102c))
+#define W12                            (*((volatile uint32_t*)0xa0001030))
+#define W13                            (*((volatile uint32_t*)0xa0001034))
+#define W14                            (*((volatile uint32_t*)0xa0001038))
+#define W15                            (*((volatile uint32_t*)0xa000103c))
+#define W16                            (*((volatile uint32_t*)0xa0001040))
+#define W17                            (*((volatile uint32_t*)0xa0001044))
+#define W18                            (*((volatile uint32_t*)0xa0001048))
+#define W19                            (*((volatile uint32_t*)0xa000104c))
+#define W20                            (*((volatile uint32_t*)0xa0001050))
+#define W21                            (*((volatile uint32_t*)0xa0001054))
+#define W22                            (*((volatile uint32_t*)0xa0001058))
+#define W23                            (*((volatile uint32_t*)0xa000105c))
+#define W24                            (*((volatile uint32_t*)0xa0001060))
+#define W25                            (*((volatile uint32_t*)0xa0001064))
+#define W26                            (*((volatile uint32_t*)0xa0001068))
+#define W27                            (*((volatile uint32_t*)0xa000106c))
+#define W28                            (*((volatile uint32_t*)0xa0001070))
+#define DIR0                           (*((volatile uint32_t*)0xa0002000)) //direction registers port 0
+#define MASK0                          (*((volatile uint32_t*)0xa0002080)) //mask register port 0
+#define PIN0                           (*((volatile uint32_t*)0xa0002100)) //port pin register port 0
+#define MPIN0                          (*((volatile uint32_t*)0xa0002180)) //masked port register port 0
+#define SET0                           (*((volatile uint32_t*)0xa0002200)) //write: set register for port 0; read: output bits for port 0
+#define CLR0                           (*((volatile uint32_t*)0xa0002280)) //clear port 0
+#define NOT0                           (*((volatile uint32_t*)0xa0002300)) //toggle port 0
+#define DIRSET0                        (*((volatile uint32_t*)0xa0002380)) //set pin direction bits for port 0
+#define DIRCLR0                        (*((volatile uint32_t*)0xa0002400)) //clear pin direction bits for port 0
+#define DIRNOT0                        (*((volatile uint32_t*)0xa0002480)) //toggle pin direction bits for port 0
+
+//SysTick timer
+#define SYST_CSR                       (*((volatile uint32_t*)0xe000e010)) //system timer control and status register
+#define SYST_RVR                       (*((volatile uint32_t*)0xe000e014)) //system timer reload value register
+#define SYST_CVR                       (*((volatile uint32_t*)0xe000e018)) //system timer current value register
+#define SYST_CALIB                     (*((volatile uint32_t*)0xe000e01c)) //system timer calibration value register
 
 // NVIC
 #define ISER0                          (*((volatile uint32_t*)0xe000e100)) //interrupt set enable
