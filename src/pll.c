@@ -11,7 +11,6 @@ void PLL_Init(void) {
    MAINCLKSEL |= (3<<0); //select main clock source PLL output
    MAINCLKUEN &= (~(1<<0)); //in order for the update to take effect, first write a zero
    MAINCLKUEN |= (1<<0); //update clock source
-   SYSAHBCLKCTRL |= (1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<6 | 1<<7 | 1<<18); //enable clock for ROM, RAM0_1, FLASHREG, FLASH, GPIO, IOCON
 }
 
 /*

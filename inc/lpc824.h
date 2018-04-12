@@ -1,5 +1,5 @@
-#ifndef __LPC1769_H__
-#define __LPC1769_H__
+#ifndef __LPC824_H__
+#define __LPC824_H__
 
 #include <stdint.h>
 
@@ -23,7 +23,7 @@
 #define IDLE_CH                        (*((volatile uint32_t*)0x400040f4)) //idle channel register (returns the number of the first idle)
 #define IRQ_FLAG                       (*((volatile uint32_t*)0x400040f8)) //global interrupt flag register
 
-// I/O configuration
+//I/O configuration
 #define PIO0_17                        (*((volatile uint32_t*)0x40044000)) //I/O configuration for pin PIO0_17/ADC_9
 #define PIO0_13                        (*((volatile uint32_t*)0x40044004)) //I/O configuration for pin PIO0_13/ADC_10
 #define PIO0_12                        (*((volatile uint32_t*)0x40044008)) //I/O configuration for pin PIO0_12
@@ -54,7 +54,7 @@
 #define PIO0_19                        (*((volatile uint32_t*)0x40044074)) //I/O configuration for pin PIO0_19/ADC_7
 #define PIO0_18                        (*((volatile uint32_t*)0x40044078)) //I/O configuration for pin PIO0_18/ADC_8
 
-// system configuration
+//system configuration
 #define SYSMEMREMAP                    (*((volatile uint32_t*)0x40048000)) //system memory remap
 #define PRESETCTRL                     (*((volatile uint32_t*)0x40048004)) //peripheral reset control
 #define SYSPLLCTRL                     (*((volatile uint32_t*)0x40048008)) //system pll control
@@ -103,7 +103,7 @@
 #define PDRUNCFG                       (*((volatile uint32_t*)0x40048238)) //power configuration register
 #define DEVICE_ID                      (*((volatile uint32_t*)0x400483f8)) //device id
 
-// switch matrix
+//switch matrix
 #define PINASSIGN0                     (*((volatile uint32_t*)0x4000c000)) //pin assign register 0
 #define PINASSIGN1                     (*((volatile uint32_t*)0x4000c004)) //pin assign register 1
 #define PINASSIGN2                     (*((volatile uint32_t*)0x4000c008)) //pin assign register 2
@@ -194,7 +194,7 @@
 #define SYST_CVR                       (*((volatile uint32_t*)0xe000e018)) //system timer current value register
 #define SYST_CALIB                     (*((volatile uint32_t*)0xe000e01c)) //system timer calibration value register
 
-// NVIC
+//NVIC
 #define ISER0                          (*((volatile uint32_t*)0xe000e100)) //interrupt set enable
 #define ICER0                          (*((volatile uint32_t*)0xe000e180)) //interrupt clear enable
 #define ISPR0                          (*((volatile uint32_t*)0xe000e200)) //interrupt set pending
@@ -208,5 +208,15 @@
 #define IPR5                           (*((volatile uint32_t*)0xe000e414)) //interrupt priority registers 5
 #define IPR6                           (*((volatile uint32_t*)0xe000e418)) //interrupt priority registers 6
 #define IPR7                           (*((volatile uint32_t*)0xe000e41c)) //interrupt priority registers 7
+
+//SCB (system control block)
+#define CPUID                          (*((volatile uint32_t*)0xe000ed00)) //CPUID register
+#define ICSR                           (*((volatile uint32_t*)0xe000ed04)) //interrupt control and state register
+#define VTOR                           (*((volatile uint32_t*)0xe000ed08)) //vector table offset register
+#define AIRCR                          (*((volatile uint32_t*)0xe000ed0c)) //application interrupt and reset control register
+#define SCR                            (*((volatile uint32_t*)0xe000ed10)) //system control register
+#define CCR                            (*((volatile uint32_t*)0xe000ed14)) //configuration and control register
+#define SHPR2                          (*((volatile uint32_t*)0xe000ed1c)) //system handler priority register 2
+#define SHPR3                          (*((volatile uint32_t*)0xe000ed20)) //system handler priority register 3
 
 #endif
