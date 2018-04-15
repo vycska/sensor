@@ -75,7 +75,8 @@ cleanall : clean
 	rm -rf libs
 
 install : all
-	lpc21isp $(TARGET).hex /dev/ttyUSB0 115200 4000
+	lpc21isp $(TARGET).hex /dev/ttyUSB0 115200 12000
+	#./lpc21isp ~/Programming/sensor/sensor.hex /dev/ttyUSB0 115200 12000
 
 picocom :
 	picocom -b 115200 --echo /dev/ttyUSB0
