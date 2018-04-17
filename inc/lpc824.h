@@ -118,6 +118,48 @@
 #define PINASSIGN11                    (*((volatile uint32_t*)0x4000c02c)) //pin assign register 11
 #define PINENABLE0                     (*((volatile uint32_t*)0x4000c1c0)) //pin enable register
 
+//USART0
+#define USART0CFG                      (*((volatile uint32_t*)0x40064000)) //USART configuration register
+#define USART0CTL                      (*((volatile uint32_t*)0x40064004)) //USART control register
+#define USART0STAT                     (*((volatile uint32_t*)0x40064008)) //USART status register
+#define USART0INTENSET                 (*((volatile uint32_t*)0x4006400c)) //interrupt enable read and set register
+#define USART0INTENCLR                 (*((volatile uint32_t*)0x40064010)) //interrupt enable clear register
+#define USART0RXDAT                    (*((volatile uint32_t*)0x40064014)) //receiver data register
+#define USART0RXDATSTAT                (*((volatile uint32_t*)0x40064018)) //receiver data with status register
+#define USART0TXDAT                    (*((volatile uint32_t*)0x4006401c)) //transmit data register
+#define USART0BRG                      (*((volatile uint32_t*)0x40064020)) //baud rate generator register
+#define USART0INTSTAT                  (*((volatile uint32_t*)0x40064024)) //interrupt status register
+#define USART0OSR                      (*((volatile uint32_t*)0x40064028)) //oversample selection register for asynchronous communication
+#define USART0ADDR                     (*((volatile uint32_t*)0x4006402c)) //address register for automatic address matching
+
+//USART1
+#define USART1CFG                      (*((volatile uint32_t*)0x40068000)) //USART configuration register
+#define USART1CTL                      (*((volatile uint32_t*)0x40068004)) //USART control register
+#define USART1STAT                     (*((volatile uint32_t*)0x40068008)) //USART status register
+#define USART1INTENSET                 (*((volatile uint32_t*)0x4006800c)) //interrupt enable read and set register
+#define USART1INTENCLR                 (*((volatile uint32_t*)0x40068010)) //interrupt enable clear register
+#define USART1RXDAT                    (*((volatile uint32_t*)0x40068014)) //receiver data register
+#define USART1RXDATSTAT                (*((volatile uint32_t*)0x40068018)) //receiver data with status register
+#define USART1TXDAT                    (*((volatile uint32_t*)0x4006801c)) //transmit data register
+#define USART1BRG                      (*((volatile uint32_t*)0x40068020)) //baud rate generator register
+#define USART1INTSTAT                  (*((volatile uint32_t*)0x40068024)) //interrupt status register
+#define USART1OSR                      (*((volatile uint32_t*)0x40068028)) //oversample selection register for asynchronous communication
+#define USART1ADDR                     (*((volatile uint32_t*)0x4006802c)) //address register for automatic address matching
+
+//USART2
+#define USART2CFG                      (*((volatile uint32_t*)0x4006c000)) //USART configuration register
+#define USART2CTL                      (*((volatile uint32_t*)0x4006c004)) //USART control register
+#define USART2STAT                     (*((volatile uint32_t*)0x4006c008)) //USART status register
+#define USART2INTENSET                 (*((volatile uint32_t*)0x4006c00c)) //interrupt enable read and set register
+#define USART2INTENCLR                 (*((volatile uint32_t*)0x4006c010)) //interrupt enable clear register
+#define USART2RXDAT                    (*((volatile uint32_t*)0x4006c014)) //receiver data register
+#define USART2RXDATSTAT                (*((volatile uint32_t*)0x4006c018)) //receiver data with status register
+#define USART2TXDAT                    (*((volatile uint32_t*)0x4006c01c)) //transmit data register
+#define USART2BRG                      (*((volatile uint32_t*)0x4006c020)) //baud rate generator register
+#define USART2INTSTAT                  (*((volatile uint32_t*)0x4006c024)) //interrupt status register
+#define USART2OSR                      (*((volatile uint32_t*)0x4006c028)) //oversample selection register for asynchronous communication
+#define USART2ADDR                     (*((volatile uint32_t*)0x4006c02c)) //address register for automatic address matching
+
 //GPIO port
 #define B0                             (*((volatile uint8_t*)0xa0000000)) //byte pin registers port 0; pins PIO0_0 to PIO0_28
 #define B1                             (*((volatile uint8_t*)0xa0000001))
