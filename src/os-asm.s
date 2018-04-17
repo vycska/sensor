@@ -9,44 +9,28 @@
 
 .thumb_func
 OS_Start:
+@load stack pointer from RunPt
 ldr r0,=RunPt
 ldr r1,[r0]
 ldr r2,[r1]
-msr msp,r2
-isb
+mov sp,r2
 
+@pop r4-r7 and r8-r11 from stack
 pop {r4-r7}
-
 pop {r0-r3}
 mov r8,r0
 mov r9,r1
 mov r10,r2
 mov r11,r3
 
-pop {r0-r3}
-
-msr psp,r0
-pop {r0}
-mov r12,r0
-
-add sp,#4
-isb
-
-pop {r0}
-mov lr,r0
-
-add sp,#4
-isb
-
-push {lr}
+@initialize systick and timer for sleeping threads
 ldr r0,=10
 bl SysTick_Init
 bl MRT0_Init
 
-pop {r0}
+@special value in lr for restoring the rest of the registers
+ldr r0,=0xfffffff9
 mov lr,r0
-
-mrs r0,psp
 
 cpsie i
 bx lr
@@ -55,31 +39,35 @@ bx lr
 SysTick_Handler:
 cpsid i
 
-push {r4-r7}
-mov r4,r8
-mov r5,r9
-mov r6,r10
-mov r7,r11
+@store r8-r11 and r4-r7 in the stack
+mov r0,r8
+mov r1,r9
+mov r2,r10
+mov r3,r11
+push {r0-r3}
 push {r4-r7}
 
+@save stack pointer in the tcb
 ldr r0,=RunPt
 ldr r1,[r0]
-mrs r2,msp
+mov r2,sp
 str r2,[r1]
 
+@run scheduler with argument RunPt in r0
 push {r0,lr}
 bl Scheduler
 
+@restore r0 and lr
 pop {r0,r1}
 mov lr,r1
 
+@assign new stack pointer value
 ldr r1,[r0]
 ldr r2,[r1]
-msr msp,r2
-isb
+mov sp,r2
 
+@pop r4-r7 and r8-r11 from the new stack
 pop {r4-r7}
-
 pop {r0-r3}
 mov r8,r0
 mov r9,r1
