@@ -23,13 +23,6 @@ void main(void) {
 
    OS_Init(NUMTHREADS,"led",5,Task_Led,"idle",31,Task_Idle);
    OS_Start();
-
-   /*
-   while(1) {
-      for(i=0;i<15000000;i++);
-      NOT0 = (1<<23);
-   }
-   */
 }
 
 void init(void) {
@@ -46,12 +39,12 @@ void init(void) {
 void Task_Led(void) {
    while(1) {
       NOT0 = (1<<23);
-      OS_Sleep(2000);
+      OS_Sleep(1000);
    }
 }
 
 void Task_Idle(void) {
    while(1) {
-      //WaitForInterrupt();
+      WaitForInterrupt();
    }
 }

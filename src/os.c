@@ -20,8 +20,8 @@ void OS_Init(int k, ...) {
       tcbs[i].priority = va_arg(va, int);
       tcbs[i].sleep = 0;                                                  // thread initially not sleeeping
       tcbs[i].block = 0;                                                  // thread initially not blocked
-      Stacks[i][STACKSIZE - 1] = 0x0100000f;                              // PSR [thumb bit and exception number 15 (systick)]
-      Stacks[i][STACKSIZE - 2] = (int)va_arg(va, void (*)(void)) | 1;     // PC
+      Stacks[i][STACKSIZE - 1] = 0x01000000;                              // PSR [thumb bit]
+      Stacks[i][STACKSIZE - 2] = (int)va_arg(va, void (*)(void));         // PC
       Stacks[i][STACKSIZE - 3] = 0x14141414;                              // LR (R14)
       Stacks[i][STACKSIZE - 4] = 0x12121212;                              // R12
       Stacks[i][STACKSIZE - 5] = 0x03030303;                              // R3
