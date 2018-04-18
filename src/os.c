@@ -18,27 +18,26 @@ void OS_Init(int k, ...) {
       tcbs[i].id = i;
       tcbs[i].name = va_arg(va, char *);
       tcbs[i].priority = va_arg(va, int);
-
-      tcbs[i].sleep = 0;        // thread initially not sleeeping
-      tcbs[i].block = 0;        // thread initially not blocked
-      Stacks[i][STACKSIZE - 1] = 0x01000000;    // PSR [thumb bit]
-      Stacks[i][STACKSIZE - 2] = (int)va_arg(va, void (*)(void));       // PC
-      Stacks[i][STACKSIZE - 3] = 0x14141414;    // R14
-      Stacks[i][STACKSIZE - 4] = 0x12121212;    // R12
-      Stacks[i][STACKSIZE - 5] = 0x03030303;    // R3
-      Stacks[i][STACKSIZE - 6] = 0x02020202;    // R2
-      Stacks[i][STACKSIZE - 7] = 0x01010101;    // R1
-      Stacks[i][STACKSIZE - 8] = 0x00000000;    // R0
-      Stacks[i][STACKSIZE - 9] = 0x11111111;    // R11
-      Stacks[i][STACKSIZE - 10] = 0x10101010;   // R10
-      Stacks[i][STACKSIZE - 11] = 0x09090909;   // R9
-      Stacks[i][STACKSIZE - 12] = 0x08080808;   // R8
-      Stacks[i][STACKSIZE - 13] = 0x07070707;   // R7
-      Stacks[i][STACKSIZE - 14] = 0x06060606;   // R6
-      Stacks[i][STACKSIZE - 15] = 0x05050505;   // R5
-      Stacks[i][STACKSIZE - 16] = 0x04040404;   // R4
-      tcbs[i].sp = &Stacks[i][STACKSIZE - 16];  // thread stack pointer
-      tcbs[i].next = &tcbs[i + 1 != k ? (i + 1) : 0];   // 0 points to 1, 1 points to 2, and so on
+      tcbs[i].sleep = 0;                                                  // thread initially not sleeeping
+      tcbs[i].block = 0;                                                  // thread initially not blocked
+      Stacks[i][STACKSIZE - 1] = 0x0100000f;                              // PSR [thumb bit and exception number 15 (systick)]
+      Stacks[i][STACKSIZE - 2] = (int)va_arg(va, void (*)(void)) | 1;     // PC
+      Stacks[i][STACKSIZE - 3] = 0x14141414;                              // LR (R14)
+      Stacks[i][STACKSIZE - 4] = 0x12121212;                              // R12
+      Stacks[i][STACKSIZE - 5] = 0x03030303;                              // R3
+      Stacks[i][STACKSIZE - 6] = 0x02020202;                              // R2
+      Stacks[i][STACKSIZE - 7] = 0x01010101;                              // R1
+      Stacks[i][STACKSIZE - 8] = 0x00000000;                              // R0
+      Stacks[i][STACKSIZE - 9] = 0x11111111;                              // R11
+      Stacks[i][STACKSIZE - 10] = 0x10101010;                             // R10
+      Stacks[i][STACKSIZE - 11] = 0x09090909;                             // R9
+      Stacks[i][STACKSIZE - 12] = 0x08080808;                             // R8
+      Stacks[i][STACKSIZE - 13] = 0x07070707;                             // R7
+      Stacks[i][STACKSIZE - 14] = 0x06060606;                             // R6
+      Stacks[i][STACKSIZE - 15] = 0x05050505;                             // R5
+      Stacks[i][STACKSIZE - 16] = 0x04040404;                             // R4
+      tcbs[i].sp = &Stacks[i][STACKSIZE - 16];                            // thread stack pointer
+      tcbs[i].next = &tcbs[i + 1 != k ? (i + 1) : 0];                     // 0 points to 1, 1 points to 2, and so on
    }
    va_end(va);
 

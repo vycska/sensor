@@ -13,7 +13,6 @@ extern char _data_start_lma, _data_start, _data_end, _bss_start, _bss_end;
 volatile long long int millis;
 
 void main(void) {
-   int i;
    PLL_Init();
    SYSAHBCLKCTRL |= (1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<6 | 1<<7 | 1<<10 | 1<<18); //enable clock for ROM, RAM0_1, FLASHREG, FLASH, GPIO, SWM, MRT, IOCON
    PRESETCTRL |= (1<<7 | 1<<10 | 1<<11); //clear MRT, GPIO, flash controller reset
@@ -22,13 +21,15 @@ void main(void) {
    PIO0_23 = 0<<3 | 0<<5 | 0<<6 | 0<<10 | 0<<11 | 0<<13; //no pu/pd, disable hysteresis, input not inverted, disable od, bypass input filter, peripheral clock divider 0
    DIR0 |= (1<<23); //set output direction
 
-   //OS_Init(NUMTHREADS,"led",5,Task_Led,"idle",31,Task_Idle);
-   //OS_Start();
+   OS_Init(NUMTHREADS,"led",5,Task_Led,"idle",31,Task_Idle);
+   OS_Start();
 
+   /*
    while(1) {
       for(i=0;i<15000000;i++);
       NOT0 = (1<<23);
    }
+   */
 }
 
 void init(void) {
