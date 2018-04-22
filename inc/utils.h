@@ -13,7 +13,6 @@ int dec2str(long long int, char *);
 int dbl2str(double, int, char *);
 int mysprintf(char *, const char *, ...);
 long long int power(int, int);
-unsigned int utime(void);
 unsigned char reflect_byte(unsigned char);
 
 #endif

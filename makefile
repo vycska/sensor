@@ -19,7 +19,7 @@ ASFLAGS := -Wa,--warn -Wa,--fatal-warnings
 CPPFLAGS := -I inc -I inc/u8g2 -I /usr/arm-none-eabi/include
 CFLAGS := -march=armv6-m -mcpu=cortex-m0plus -mthumb -mfloat-abi=soft -mlittle-endian -ffreestanding -fsigned-char -fdata-sections -ffunction-sections -O1 -Wall -Werror
 LDFLAGS := -nostdlib -nostartfiles -nodefaultlibs -Llibs -L/usr/arm-none-eabi/lib/armv6-m -L/usr/lib/gcc/arm-none-eabi/7.3.0/armv6-m -T $(TARGET).ld -Wl,-Map=$(TARGET).map -Wl,--cref -Wl,--gc-sections
-LDLIBS := -lgcc -lc_nano -lnosys -lm -lu8g2
+LDLIBS := -lc_nano -lnosys -lm -lu8g2 -lgcc
 
 ifeq ($(DEBUG),1)
    CFLAGS+=-g
@@ -78,7 +78,7 @@ install : all
 	~/bin/lpc21isp $(TARGET).hex /dev/ttyUSB0 115200 12000
 
 picocom :
-	picocom -b 115200 --echo /dev/ttyUSB0
+	picocom -b 9600 --echo /dev/ttyUSB0
 
 tags :
 	ctags -R --extra=+f *

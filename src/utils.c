@@ -132,19 +132,6 @@ long long int power(int a, int k) {
    return s;
 }
 
-unsigned int utime(void) {
-   struct tm stm;
-
-   stm.tm_sec = SEC;
-   stm.tm_min = MIN;
-   stm.tm_hour = HOUR;
-   stm.tm_mday = DOM;
-   stm.tm_mon = MONTH - 1;
-   stm.tm_year = YEAR - 1900;
-   stm.tm_isdst = -1;
-   return mktime(&stm);
-}
-
 unsigned char reflect_byte(unsigned char b) {
    b = ((b & 0xf0) >> 4) | ((b & 0xf) << 4);
    b = ((b & 0xcc) >> 2) | ((b & 0x33) << 2);

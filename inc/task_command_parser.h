@@ -1,5 +1,5 @@
-#ifndef TASK_COMMAND_PARSER_H
-#define TASK_COMMAND_PARSER_H
+#ifndef __TASK_COMMAND_PARSER_H__
+#define __TASK_COMMAND_PARSER_H__
 
 void Task_Command_Parser(void);
 

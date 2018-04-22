@@ -49,7 +49,7 @@ int params_count(unsigned int *params) {
 void Task_Command_Parser(void) {
    char *pString, buf[128];
    int i, smphrFinished;
-   unsigned int params[16];
+   unsigned int params[8];
 
    Fifo_Uart0_Put("Task_Command_Parser has started", 0);
    OS_InitSemaphore(&smphrFinished, 0);
