@@ -20,7 +20,7 @@ void onewire_releaseline(void) {
 }
 
 unsigned char onewire_getlinevalue(void) {
-   return B13&1;
+   return (PIN0>>13)&1;
 }
 
 void onewire_delay(int us) {

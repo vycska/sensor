@@ -108,6 +108,10 @@ int mysprintf(char *buf, const char *format, ...) {
                strcpy(&buf[j], s);
                k = strlen(s);
                break;
+            case 'n':
+               k = va_arg(va, int);
+               for(d=j;d<k+j;buf[d++]=' ');
+               break;
             default:
                k = 1;
                buf[j] = '?';
@@ -137,4 +141,13 @@ unsigned char reflect_byte(unsigned char b) {
    b = ((b & 0xcc) >> 2) | ((b & 0x33) << 2);
    b = ((b & 0xaa) >> 1) | ((b & 0x55) << 1);
    return b;
+}
+
+int ndigits(int n) {
+   int k=0;
+   do {
+      n/=10;
+      k+=1;
+   } while(n>0);
+   return k;
 }

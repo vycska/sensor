@@ -85,7 +85,8 @@ void Task_Command_Parser(void) {
          }
          case 0xca53:{         //task_info
             for(i = 0; i < NUMTHREADS; i++) {
-               mysprintf(buf, "%d %s \t\t\t [%d]: sp: %x, \t\t sleep: %d, \t\t block: %x", (int)tcbs[i].id, tcbs[i].name, (int)tcbs[i].priority, tcbs[i].sp, tcbs[i].sleep, tcbs[i].block);
+               mysprintf(buf, "%d %s %n pr: %d %n sp: %x sl: %d %n bl: %x",
+               (int)tcbs[i].id, tcbs[i].name, 20-strlen(tcbs[i].name), (int)tcbs[i].priority, 4-ndigits(tcbs[i].priority), tcbs[i].sp, tcbs[i].sleep, 7-ndigits(tcbs[i].sleep), tcbs[i].block);
                Fifo_Uart0_Put(buf, &smphrFinished);
                OS_Blocking_Wait(&smphrFinished);
             }

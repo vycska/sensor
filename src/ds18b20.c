@@ -31,7 +31,7 @@ void DS18B20_ConvertTAll(void) {
    EnableInterrupts();
 }
 
-int DS18B20_ReadScratchpad(unsigned char *m, unsigned char *d) {        //m yra NULL arba 8 baitu masyvas, data - 9 baitu masyvas
+int DS18B20_ReadScratchpad(unsigned char *m, unsigned char *d) { //m yra NULL arba 8 baitu masyvas, data - 9 baitu masyvas
    int i;
    DisableInterrupts();
    onewire_reset();

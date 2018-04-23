@@ -39,6 +39,6 @@ void MRT_IRQHandler(void) {
 void MRT1_Delay(int ns) {
    CTRL1 = (0<<0 | 1<<1); //interrupt disable, one-shot interrupt mode
    TIMER1 = 0;
-   INTVAL1 = (MAX2(ns*CLOCK/1000,2)) | (1u<<31);
+   INTVAL1 = (MAX2(ns*CLOCK/1000,1)) | (1u<<31);
    while(STAT1&(1<<1)); //wait while timer is running
 }

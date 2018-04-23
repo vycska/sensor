@@ -27,11 +27,13 @@ void Task_DS18B20(void) {
    k = DS18B20_ReadROM(data);
    OS_Blocking_Signal(&mtx_mrt1);
 
-   l = mysprintf(s, "one-wire device: ");
-   for(i = 0; i < 8; i++)
-      l += mysprintf(&s[l], "0x%x%s", (unsigned int)data[i], i == 7 ? "." : " ");
-   Fifo_Uart0_Put(s, &smphrFinished);
-   OS_Blocking_Wait(&smphrFinished);
+   if(k == DS18B20_OK) {
+      l = mysprintf(s, "one-wire device: ");
+      for(i = 0; i < 8; i++)
+         l += mysprintf(&s[l], "0x%x%s", (unsigned int)data[i], i == 7 ? "." : " ");
+      Fifo_Uart0_Put(s, &smphrFinished);
+      OS_Blocking_Wait(&smphrFinished);
+   }
 
    while(1) {
       OS_Blocking_Wait(&mtx_mrt1);
@@ -45,10 +47,6 @@ void Task_DS18B20(void) {
       OS_Blocking_Signal(&mtx_mrt1);
 
       task_ds18b20_data.temperature = (k==DS18B20_OK ? DS18B20_GetTemperature(data)*100 : -10000);
-
-      mysprintf(s,"temperature: %f2",task_ds18b20_data.temperature/100.0);
-      Fifo_Uart0_Put(s,&smphrFinished);
-      OS_Blocking_Wait(&smphrFinished);
 
       OS_Sleep(1000);
    }

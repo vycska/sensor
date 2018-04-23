@@ -14,5 +14,6 @@ int dbl2str(double, int, char *);
 int mysprintf(char *, const char *, ...);
 long long int power(int, int);
 unsigned char reflect_byte(unsigned char);
+int ndigits(int);
 
 #endif
