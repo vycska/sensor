@@ -78,7 +78,7 @@ install : all
 	~/bin/lpc21isp $(TARGET).hex /dev/ttyUSB0 115200 12000
 
 picocom :
-	picocom -b 9600 --echo /dev/ttyUSB0
+	picocom -b 38400 --echo /dev/ttyUSB0
 
 tags :
 	ctags -R --extra=+f *

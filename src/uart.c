@@ -54,3 +54,23 @@ void UART0_IRQHandler(void) {
       }
    }
 }
+
+/*
+divided_clock = MAINCLOCK / uartdiv; u_pcl = divided_clock / (1+mult/256); baud_rate = u_pclk / (16 * brgval)
+#define MAINCLOCK 60000000
+int main(void) {
+   int baud_rate, mult, brgval, uartdiv, min, u_pclk, divided_clock;
+   while(printf("desirable baud_rate: "),scanf("%d",&baud_rate)==1 && baud_rate!=0)
+      for(min=0,uartdiv=1;uartdiv<=255;uartdiv++)
+         if(MAINCLOCK%uartdiv==0)
+            for(divided_clock = MAINCLOCK/uartdiv,mult=0;mult<=255;mult++)
+               if(divided_clock%(256+mult)==0) {
+                  u_pclk = divided_clock/(256+mult)*256;
+                  if(u_pclk%(16*baud_rate)==0) {
+                     brgval = u_pclk/(baud_rate*16);
+                     printf("uartdiv: %d, divided_clock: %d, mult: %d, u_pclk: %d, brgval: %d\n",uartdiv,divided_clock,mult,u_pclk,brgval);
+                  }
+               }
+   return 0;
+}
+*/
