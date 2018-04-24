@@ -23,6 +23,33 @@
 #define IDLE_CH                        (*((volatile uint32_t*)0x400040f4)) //idle channel register (returns the number of the first idle)
 #define IRQ_FLAG                       (*((volatile uint32_t*)0x400040f8)) //global interrupt flag register
 
+//ADC
+#define ADCCTRL                        (*((volatile uint32_t*)0x4001c000)) //A/D control register
+#define ADCSEQA_CTRL                   (*((volatile uint32_t*)0x4001c008)) //A/D conversion sequence-A control register
+#define ADCSEQB_CTRL                   (*((volatile uint32_t*)0x4001c00c)) //A/D conversion sequence-B control register
+#define ADCSEQA_GDAT                   (*((volatile uint32_t*)0x4001c010)) //A/D sequence-A global data register
+#define ADCSEQB_GDAT                   (*((volatile uint32_t*)0x4001c014)) //A/D sequence-B global data register
+#define ADCDAT0                        (*((volatile uint32_t*)0x4001c020)) //A/D channel 0 data register
+#define ADCDAT1                        (*((volatile uint32_t*)0x4001c024)) //A/D channel 1 data register
+#define ADCDAT2                        (*((volatile uint32_t*)0x4001c028)) //A/D channel 2 data register
+#define ADCDAT3                        (*((volatile uint32_t*)0x4001c02c)) //A/D channel 3 data register
+#define ADCDAT4                        (*((volatile uint32_t*)0x4001c030)) //A/D channel 4 data register
+#define ADCDAT5                        (*((volatile uint32_t*)0x4001c034)) //A/D channel 5 data register
+#define ADCDAT6                        (*((volatile uint32_t*)0x4001c038)) //A/D channel 6 data register
+#define ADCDAT7                        (*((volatile uint32_t*)0x4001c03c)) //A/D channel 7 data register
+#define ADCDAT8                        (*((volatile uint32_t*)0x4001c040)) //A/D channel 8 data register
+#define ADCDAT9                        (*((volatile uint32_t*)0x4001c044)) //A/D channel 9 data register
+#define ADCDAT10                       (*((volatile uint32_t*)0x4001c048)) //A/D channel 10 data register
+#define ADCDAT11                       (*((volatile uint32_t*)0x4001c04c)) //A/D channel 11 data register
+#define ADCTHR0_LOW                    (*((volatile uint32_t*)0x4001c050)) //A/D low compare threshold register 0
+#define ADCTHR1_LOW                    (*((volatile uint32_t*)0x4001c054)) //A/D low compare threshold register 1
+#define ADCTHR0_HIGH                   (*((volatile uint32_t*)0x4001c058)) //A/D high compare threshold register 0
+#define ADCTHR1_HIGH                   (*((volatile uint32_t*)0x4001c05c)) //A/D high compare threshold register 1
+#define ADCCHAN_THRSEL                 (*((volatile uint32_t*)0x4001c060)) //A/D channel-threshold select register
+#define ADCINTEN                       (*((volatile uint32_t*)0x4001c064)) //A/D interrupt enable register
+#define ADCFLAGS                       (*((volatile uint32_t*)0x4001c068)) //A/D flags register
+#define ADCTRM                         (*((volatile uint32_t*)0x4001c06c)) //ADC trim register
+
 //I/O configuration
 #define PIO0_17                        (*((volatile uint32_t*)0x40044000)) //I/O configuration for pin PIO0_17/ADC_9
 #define PIO0_13                        (*((volatile uint32_t*)0x40044004)) //I/O configuration for pin PIO0_13/ADC_10
