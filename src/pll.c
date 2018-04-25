@@ -1,7 +1,6 @@
 #include "lpc824.h"
 
 void PLL_Init(void) {
-   PDRUNCFG &= (~(1<<7)); //system pll powered
    SYSPLLCLKSEL &= (~(3<<0)); //system pll clock source IRC
    SYSPLLCLKUEN &= (~(1<<0)); //in order for the update to take effect, first write a zero
    SYSPLLCLKUEN |= (1<<0); //update system pll clock source
