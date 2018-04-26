@@ -2,27 +2,26 @@
 #include "main.h"
 #include "lpc824.h"
 
-volatile int adc;
+volatile int adc = -1;
 
 void ADC_Init(void) {
-   PIO0_14 = 0;
+   ADCSEQA_CTRL &= (~(1u<<31)); //disable sequence A
+   ADCSEQB_CTRL &= (~(1u<<31)); //disable sequence B
+   PIO0_14 = 0; //the most important here is disabling pd/pu resistors
    PINENABLE0 &= (~(1<<15)); //ADC_2 enabled on PIO0_14
+   ADCTHR0_LOW = ADCTHR1_LOW = ADCTHR0_HIGH = ADCTHR1_HIGH = 0; //threshold intervals not used
+   ADCCHAN_THRSEL = 0; //threshold intervals not used, but set THR0 (not THR1) to be used for all channels
    ADCTRM &= (~(1<<5)); //VDD = 2.7V to 3.6V
-   //calibration
-   ADCCTRL = ((CLOCK*2)<<0 | 0<<10 | 1<<30); //set calibration mode, divider for 500kHz, clear LPWR
-   while(ADCCTRL&(1<<30));
-   ADCCTRL = (0<<0 | 1<<10); //divider is 1, set low power mode
-   ADCSEQA_CTRL = (1<<2 | 0<<12 | 1<<30 | 1u<<31); //select channel 2, conversions are initiated by software, end of sequence mode, sequence enabled
-   //select channel 2
-   //set TRIGPOL and SEQ_ENA
-   //set start
-   //read results
-   //IPR4 = (IPR4&(~(3<<6))) | (2<<6); //interrupt priority 2
-   //ISER0 = (1<<16); //ADC_SEQA interrupt enable
+   ADCCTRL = ((CLOCK*2)<<0 | 0<<10 | 1<<30); //divider for 500kHz, low power mode, calibration mode
+   while(ADCCTRL&(1<<30)); //wait for calibration cycle to complete
+   ADCCTRL = (0<<0 | 1<<10); //divider 0+1, low power mode
+   ADCSEQA_CTRL = (1<<2 | 0<<12 | 1<<18 | 0<<19 | 0<<26 | 0<<27 | 0<<28 | 0<<29 | 1<<30 | 1u<<31); //select channel 2, conversions are initiated by software, polarity is positive edge, enable synchronization, no start, no burst, no singlestep, low priority for sequence A, end of sequence mode, sequence enabled
+   ADCINTEN = (1<<0); //sequence A interrupt enable (end of sequence because of mode) [no sequence B, overrun and threshold comparison for all channels interrupts]
+   IPR4 = (IPR4&(~(3<<6))) | (2<<6); //interrupt priority 2 (0 = highest, 3 = lowest)
+   ISER0 = (1<<16); //ADC_SEQA interrupt enable
 }
 
-/*
 void ADC_SEQA_IRQHandler(void) {
-
+   ADCFLAGS = (1<<28); //clear sequence A end of sequence interrupt flag
+   adc = (ADCDAT2>>4)&0xfff;
 }
-*/

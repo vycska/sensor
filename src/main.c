@@ -1,5 +1,7 @@
 #include "main.h"
+#include "adc.h"
 #include "fifos.h"
+#include "mrt.h"
 #include "os.h"
 #include "os-asm.h"
 #include "pll.h"
@@ -24,10 +26,12 @@ void main(void) {
    SYSAHBCLKCTRL |= (1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<6 | 1<<7 | 1<<10 | 1<<14 | 1<<18 | 1<<24); //enable clock for ROM, RAM0_1, FLASHREG, FLASH, GPIO, SWM, MRT, USART0, IOCON, ADC
    PRESETCTRL |= (1<<2 | 1<<3 | 1<<7 | 1<<10 | 1<<11); //clear USART FRG, USART0, MRT, GPIO, flash controller reset
 
+   ADC_Init();
    UART0_Init();
+   MRT2_Init(1000);
 
    PINENABLE0 |= (1<<3 | 1<<16); //ACMP_I4 and ADC_3 disabled on pin PIO0_23
-   PIO0_23 = 0<<3 | 0<<5 | 0<<6 | 0<<10 | 0<<11 | 0<<13; //no pu/pd, disable hysteresis, input not inverted, disable od, bypass input filter, peripheral clock divider 0
+   PIO0_23 = (0<<3 | 0<<5 | 0<<6 | 0<<10 | 0<<11 | 0<<13); //no pu/pd, disable hysteresis, input not inverted, disable od, bypass input filter, peripheral clock divider 0
    DIR0 |= (1<<23); //set output direction
 
    Fifo_Uart0_Init();

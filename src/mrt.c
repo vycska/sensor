@@ -11,7 +11,7 @@ void MRT0_Init(void) {
    IPR2 = (IPR2&(~(3<<22))) | (0<<22); //priority 0 (highest)
    ISER0 = (1<<10); //interrupt enable
    CTRL0 = (1<<0 | 0<<1); //enable interrupt, repeat interrupt mode
-   INTVAL0 = 1*CLOCK*1000 | 1u<<31; //load value for 1 ms, force load
+   INTVAL0 = (1*CLOCK*1000) | 1u<<31; //load value for 1 ms, force load
 }
 
 void MRT_IRQHandler(void) {
@@ -30,6 +30,7 @@ void MRT_IRQHandler(void) {
    }
    if(STAT2&(1<<0)) { //TIMER2
       STAT2 |= (1<<0);
+      ADCSEQA_CTRL |= (1<<26); //start conversion on adc sequence A
    }
    if(STAT3&(1<<0)) { //TIMER3
       STAT3 |= (1<<0);
@@ -38,7 +39,11 @@ void MRT_IRQHandler(void) {
 
 void MRT1_Delay(int ns) {
    CTRL1 = (1<<0 | 1<<1); //interrupt disable, one-shot interrupt mode
-   TIMER1 = 0;
    INTVAL1 = (MAX2(ns*CLOCK/1000,1)) | (1u<<31);
    while(STAT1&(1<<1)); //wait while timer is running
+}
+
+void MRT2_Init(int ms) {
+   INTVAL2 = (ms*CLOCK*1000) | 1u<<31;
+   CTRL2 = (1<<0 | 0<<1); //enable interrupt, repeat interrupt mode
 }
