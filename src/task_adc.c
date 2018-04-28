@@ -28,6 +28,6 @@ void Task_ADC(void) {
          mysprintf(s, "%u %f2V", adc, (char *)&value);
          Fifo_Uart0_Put(s,&smphrFinished);
       }
-      OS_Sleep(2000);
+      OS_Sleep(1000);
    }
 }
