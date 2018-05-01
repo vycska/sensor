@@ -2,7 +2,7 @@
 #include "main.h"
 #include "lpc824.h"
 
-volatile int adc = -1;
+volatile int adc;
 
 void ADC_Init(void) {
    ADCSEQA_CTRL &= (~(1u<<31)); //disable sequence A

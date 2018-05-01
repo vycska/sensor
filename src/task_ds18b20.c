@@ -8,12 +8,10 @@
 #include "lpc824.h"
 #include <string.h>
 
-extern int mtx_mrt1;
-
 struct Task_DS18B20_Data task_ds18b20_data;
 
 void Task_DS18B20(void) {
-   char s[64];
+   char s[80];
    unsigned char data[9];
    int i,k,l,smphrFinished;
 
@@ -23,9 +21,7 @@ void Task_DS18B20(void) {
 
    OS_InitSemaphore(&smphrFinished, 0);
 
-   OS_Blocking_Wait(&mtx_mrt1);
    k = DS18B20_ReadROM(data);
-   OS_Blocking_Signal(&mtx_mrt1);
 
    if(k == DS18B20_OK) {
       l = mysprintf(s, "one-wire device: ");
@@ -36,18 +32,10 @@ void Task_DS18B20(void) {
    }
 
    while(1) {
-      OS_Blocking_Wait(&mtx_mrt1);
       DS18B20_ConvertTAll();
-      OS_Blocking_Signal(&mtx_mrt1);
-
       OS_Sleep(750); //conversion time
-
-      OS_Blocking_Wait(&mtx_mrt1);
       k = DS18B20_ReadScratchpad(0,data);
-      OS_Blocking_Signal(&mtx_mrt1);
-
       task_ds18b20_data.temperature = (k==DS18B20_OK ? DS18B20_GetTemperature(data)*100 : -10000);
-
       OS_Sleep(1000);
    }
 }

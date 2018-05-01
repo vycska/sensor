@@ -38,12 +38,19 @@ void MRT_IRQHandler(void) {
 }
 
 void MRT1_Delay(int ns) {
-   CTRL1 = (1<<0 | 1<<1); //interrupt disable, one-shot interrupt mode
+   CTRL1 = (0<<0 | 1<<1); //interrupt disable, one-shot interrupt mode
    INTVAL1 = (MAX2(ns*CLOCK/1000,1)) | (1u<<31);
    while(STAT1&(1<<1)); //wait while timer is running
 }
 
-void MRT2_Init(int ms) {
-   INTVAL2 = (ms*CLOCK*1000) | 1u<<31;
+void MRT2_Init(int ms) { //paleidzia ADC matavimus
    CTRL2 = (1<<0 | 0<<1); //enable interrupt, repeat interrupt mode
+   INTVAL2 = (ms*CLOCK*1000) | (1u<<31);
+}
+
+
+void MRT3_Delay(int us) {
+   CTRL3 = (0<<0 | 1<<1); //interrupt disable, one-shot interrupt mode
+   INTVAL3 = (us*CLOCK) | (1u<<31);
+   while(STAT3&(1<<1)); //wait while timer is running
 }

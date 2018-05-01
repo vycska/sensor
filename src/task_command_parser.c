@@ -1,5 +1,6 @@
 #include "task_command_parser.h"
 #include "fifos.h"
+#include "onewire.h"
 #include "os.h"
 #include "utils.h"
 #include "utils-asm.h"
@@ -34,6 +35,32 @@ void Task_Command_Parser(void) {
       params_fill(pString, params);
 
       switch (crc16((unsigned char *)params[1], strlen((char *)params[1]))) {
+         case 0xea72: { //owreset
+            onewire_reset();
+            break;
+         }
+         case 0x7646: { //owlow
+            onewire_drivelinelow();
+            break;
+         }
+         case 0xed1a: { //owhigh
+            onewire_releaseline();
+            break;
+         }
+         case 0x107e: { //owvalue
+            unsigned char v;
+            v = onewire_getlinevalue();
+            mysprintf(buf,"%d",(int)v);
+            Fifo_Uart0_Put(buf,&smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+            break;
+         }
+         case 0xeac9: { //owdelay
+            onewire_drivelinelow();
+            onewire_delay(500);
+            onewire_releaseline();
+            break;
+         }
          case 0x178a: {         //system_reset
             SystemReset();
             break;

@@ -24,7 +24,7 @@ unsigned char onewire_getlinevalue(void) {
 }
 
 void onewire_delay(int us) {
-   MRT1_Delay(1000*us);
+   MRT3_Delay(us);
 }
 
 int onewire_reset(void) { //1 - presence pulse detected, 0 - presence pulse not detected
