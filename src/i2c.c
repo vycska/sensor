@@ -9,25 +9,31 @@ void I2C0_Init(void) {
    PINENABLE0 &= (~(1<<11 | 1<<12)); //I2C0_SDA enabled on pin PIO0_11, I2C0_SCL enabled on pin PIO0_10
    PIO0_11 = (0<<6 | 0<<8 | 0<<11 | 0<<13); //input not inverted, standard/fast mode I2C, bypass input filter, peripheral clock divider 0
    PIO0_10 = (0<<6 | 0<<8 | 0<<11 | 0<<13); //input not inverted, standard/fast mode I2C, bypass input filter, peripheral clock divider 0
-   IPR2 = (IPR2&(~(3<<6))) | (1<<6); //I2C0 interrupt priority 1 (0 = highest, 3 = lowest)
-   ISER0 = (1<<8); //I2C0 interrupt enable
-   //set MSTEN in CFG
+   I2C0CLKDIV = (CLOCK-1); //pclk divider to produce function clock of 1MHz
+   I2C0MSTTIME = (3<<0 | 3<<4); //SCL low time is 3+2, SCL high time is 3+2
+   I2C0TIMEOUT |= (0xfff<<4); //timeout value (will not be used)
+   I2C0INTENCLR = (1<<0 | 1<<4 | 1<<6 | 1<<8 | 1<<11 | 1<<15 | 1<<16 | 1<<17 | 1<<19 | 1<<24 | 1<<25); //no interrupts
+   //IPR2 = (IPR2&(~(3<<6))) | (1<<6); //I2C0 interrupt priority 1 (0 = highest, 3 = lowest)
+   //ISER0 = (1<<8); //I2C0 interrupt enable
    I2C0CFG = (1<<0 | 0<<1 | 0<<2 | 0<<3 | 0<<4); //master enable, slave disable, monitor disabled, timeout disabled, monitor clock stretching disabled
 }
 
 int I2C0_Write(unsigned char slave,unsigned char *s,int k) {
+   int i;
    if((I2C0STAT&(1<<0))==1 && ((I2C0STAT>>1)&0x7)==0) { //master function is idle
-   //write the slave address with RW set to 0 to MSTDAT
-   //start the transmission by setting the MSTSTART
-   
-   while((I2C0STAT&(1<<0))==0); //wait for pending status to be set by polling STAT register
-   if(((I2C0STAT>>1)&0x7)==2) { //transmit ready (ack received by slave)
+      I2C0MSTDAT = (slave<<1 | 0<<0); //write the slave address with RW set to 0 to MSTDAT
+      I2C0MSTCTL = (1<<1); //start the transmission by setting the MSTSTART
+      while((I2C0STAT&(1<<0))==0); //wait for pending status to be set by polling STAT register
+      if(((I2C0STAT>>1)&0x7)==2) { //transmit ready (ack received by slave)
 
-   }
+      }
+      else {
+         //send a stop
+      }
    //write 8 bits of data to the MSTDAT
-   //continue with the transmission by setting MSTCONT
+   I2C0MSTCTL = (1<<0); //continue with the transmission by setting MSTCONT
    //wait for pending status to be set
-   //stop the transmission by setting MSTSTOP
+   I2C0MSTCTL = (1<<2); //stop the transmission by setting MSTSTOP
    }
 }
 
