@@ -1,4 +1,5 @@
 #include "task_command_parser.h"
+#include "bme280.h"
 #include "fifos.h"
 #include "onewire.h"
 #include "os.h"
@@ -15,6 +16,7 @@ int params_count(unsigned int*);
 int params_integer(char,unsigned int*);
 
 extern volatile long long int millis;
+extern struct BME280_Config bme280_config;
 extern struct tcb *RunPt;
 extern struct tcb tcbs[NUMTHREADS];
 
@@ -35,32 +37,6 @@ void Task_Command_Parser(void) {
       params_fill(pString, params);
 
       switch (crc16((unsigned char *)params[1], strlen((char *)params[1]))) {
-         case 0xea72: { //owreset
-            onewire_reset();
-            break;
-         }
-         case 0x7646: { //owlow
-            onewire_drivelinelow();
-            break;
-         }
-         case 0xed1a: { //owhigh
-            onewire_releaseline();
-            break;
-         }
-         case 0x107e: { //owvalue
-            unsigned char v;
-            v = onewire_getlinevalue();
-            mysprintf(buf,"%d",(int)v);
-            Fifo_Uart0_Put(buf,&smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
-            break;
-         }
-         case 0xeac9: { //owdelay
-            onewire_drivelinelow();
-            onewire_delay(500);
-            onewire_releaseline();
-            break;
-         }
          case 0x178a: {         //system_reset
             SystemReset();
             break;
@@ -84,6 +60,120 @@ void Task_Command_Parser(void) {
                Fifo_Uart0_Put(buf, &smphrFinished);
                OS_Blocking_Wait(&smphrFinished);
             }
+            break;
+         }
+         case 0xa577:{         //bme280_config
+            mysprintf(buf, "dig_T1: %d", (int)bme280_config.dig_T1);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_T2: %d", (int)bme280_config.dig_T2);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_T3: %d", (int)bme280_config.dig_T3);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_P1: %d", (int)bme280_config.dig_P1);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_P2: %d", (int)bme280_config.dig_P2);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_P3: %d", (int)bme280_config.dig_P3);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_P4: %d", (int)bme280_config.dig_P4);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_P5: %d", (int)bme280_config.dig_P5);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_P6: %d", (int)bme280_config.dig_P6);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_P7: %d", (int)bme280_config.dig_P7);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_P8: %d", (int)bme280_config.dig_P8);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_P9: %d", (int)bme280_config.dig_P9);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_H1: %d", (int)bme280_config.dig_H1);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_H2: %d", (int)bme280_config.dig_H2);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_H3: %d", (int)bme280_config.dig_H3);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_H4: %d", (int)bme280_config.dig_H4);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_H5: %d", (int)bme280_config.dig_H5);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "dig_H6: %d", (int)bme280_config.dig_H6);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "t_fine: %d", (int)bme280_config.t_fine);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "os_h: %d", (int)bme280_config.os_h);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "os_p: %d", (int)bme280_config.os_p);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "os_t: %d", (int)bme280_config.os_t);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "adc_H: %d", (int)bme280_config.adc_H);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "adc_P: %d", (int)bme280_config.adc_P);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "adc_T: %d", (int)bme280_config.adc_T);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "H: %d", (int)bme280_config.H);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "P: %d", (int)bme280_config.P);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+
+            mysprintf(buf, "T: %d", (int)bme280_config.T);
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
             break;
          }
          case 0xed5: {          //psr

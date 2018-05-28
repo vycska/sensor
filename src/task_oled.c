@@ -1,6 +1,7 @@
 #include "task_oled.h"
 #include "fifos.h"
 #include "os.h"
+#include "task_bme280.h"
 #include "task_ds18b20.h"
 #include "mrt.h"
 #include "u8g2.h"
@@ -11,11 +12,13 @@ uint8_t u8x8_gpio_and_delay(u8x8_t*,uint8_t,uint8_t,void*);
 
 extern volatile int adc;
 extern struct Task_DS18B20_Data task_ds18b20_data;
+extern struct Task_BME280_Data task_bme280_data;
 
 u8g2_t u8g2; //a structure which contains all the data for one display
 
 void Task_Oled(void) {
    char buf[64];
+   int state=0;
    double v;
 
    Fifo_Uart0_Put("Task_Oled has started",0);
@@ -38,10 +41,26 @@ void Task_Oled(void) {
    while(1) {
       u8g2_ClearBuffer(&u8g2);
       
-      u8g2_SetFont(&u8g2,u8g2_font_fur30_tf);
-      v=task_ds18b20_data.temperature/100.0;
-      mysprintf(buf,"%f1%s",(char*)&v,"\xb0""C");
-      u8g2_DrawStr(&u8g2,6,58,buf);
+      u8g2_SetFont(&u8g2,u8g2_font_fur25_tf);
+      switch(state) {
+         case 0:
+            v=task_ds18b20_data.temperature/100.0;
+            mysprintf(buf,"%f1%s",(char*)&v,"\xb0""C");
+            break;
+         case 1:
+            v = task_bme280_data.t/100.0;
+            mysprintf(buf,"%f1%s",(char*)&v,"\xb0""C");
+            break;
+         case 2:
+            v = task_bme280_data.h/100.0;
+            mysprintf(buf,"%f1%%",(char*)&v);
+            break;
+         case 3:
+            v = task_bme280_data.p/100.0;
+            mysprintf(buf,"%f1mm",(char*)&v);
+            break;
+      }
+      u8g2_DrawStr(&u8g2,2,58,buf);
 
       u8g2_SetFont(&u8g2,u8g2_font_5x8_tf);
       v = adc/4095.0*3.3;
@@ -50,6 +69,7 @@ void Task_Oled(void) {
 
       u8g2_SendBuffer(&u8g2);
 
+      state = (state+1)%4;
       OS_Sleep(1500);
    }
 }

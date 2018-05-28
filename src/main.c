@@ -1,6 +1,7 @@
 #include "main.h"
 #include "adc.h"
 #include "fifos.h"
+#include "i2c.h"
 #include "mrt.h"
 #include "os.h"
 #include "os-asm.h"
@@ -17,7 +18,7 @@
 
 extern char _data_start_lma, _data_start, _data_end, _bss_start, _bss_end;
 
-int mtx_mrt1;
+int mtx_i2c0,mtx_mrt1;
 volatile long long int millis;
 
 void main(void) {
@@ -27,6 +28,7 @@ void main(void) {
 
    PLL_Init();
    ADC_Init();
+   I2C0_Init();
    UART0_Init();
    MRT2_Init(1000);
 
@@ -37,6 +39,7 @@ void main(void) {
    Fifo_Uart0_Init();
    Fifo_Command_Parser_Init();
 
+   OS_InitSemaphore(&mtx_i2c0,1);
    OS_InitSemaphore(&mtx_mrt1,1);
 
    OS_Init(NUMTHREADS,

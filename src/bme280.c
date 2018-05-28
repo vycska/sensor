@@ -3,51 +3,46 @@
 #include "i2c.h"
 #include "os.h"
 #include "utils.h"
-#include "LPC1769.h"
+#include "lpc824.h"
 
-extern int mtx_i2c[3];
-extern struct I2C i2c[3];
+extern int mtx_i2c0;
 
 struct BME280_Config bme280_config;
 
 int BME280_RegisterRead(unsigned int r, unsigned char *d, int l) {
    unsigned char reg[1];
+   int ok;
+   struct I2C i2c;
 
-   OS_Spinning_Wait(&mtx_i2c[0]);
-   i2c[0].slave = BME280_SLAVE;
-   i2c[0].active_buffer = 0;
-   i2c[0].direction = 2;        //write then read
-   i2c[0].current = 0;
-   i2c[0].status = 0;
+   OS_Spinning_Wait(&mtx_i2c0);
+   i2c.slave = BME280_SLAVE;
+   i2c.direction = 2;        //write then read
    reg[0] = r;
-   i2c[0].buffer[0] = reg;
-   i2c[0].length[0] = 1;
-   i2c[0].buffer[1] = d;
-   i2c[0].length[1] = l;
-   I2C_Start(0);
-   while(i2c[0].status == 0 || (I2C0CONSET & ((1 << 3) | (1 << 4) | (1 << 5))) != 0);
-   OS_Spinning_Signal(&mtx_i2c[0]);
-   return i2c[0].status;
+   i2c.buffer[0] = reg;
+   i2c.length[0] = 1;
+   i2c.buffer[1] = d;
+   i2c.length[1] = l;
+   ok = I2C0_Transaction(&i2c);
+   OS_Spinning_Signal(&mtx_i2c0);
+   return ok;
 }
 
 int BME280_RegisterWrite(unsigned int r, unsigned char *d, int l) {
    unsigned char reg[1];
+   int ok;
+   struct I2C i2c;
 
-   OS_Spinning_Wait(&mtx_i2c[0]);
-   i2c[0].slave = BME280_SLAVE;
-   i2c[0].active_buffer = 0;
-   i2c[0].direction = 0;        //write
-   i2c[0].current = 0;
-   i2c[0].status = 0;
+   OS_Spinning_Wait(&mtx_i2c0);
+   i2c.slave = BME280_SLAVE;
+   i2c.direction = 0;        //write
    reg[0] = r;
-   i2c[0].buffer[0] = reg;
-   i2c[0].length[0] = 1;
-   i2c[0].buffer[1] = d;
-   i2c[0].length[1] = l;
-   I2C_Start(0);
-   while(i2c[0].status == 0 || (I2C0CONSET & ((1 << 3) | (1 << 4) | (1 << 5))) != 0);
-   OS_Spinning_Signal(&mtx_i2c[0]);
-   return i2c[0].status;
+   i2c.buffer[0] = reg;
+   i2c.length[0] = 1;
+   i2c.buffer[1] = d;
+   i2c.length[1] = l;
+   ok = I2C0_Transaction(&i2c);
+   OS_Spinning_Signal(&mtx_i2c0);
+   return ok;
 }
 
 void BME280_Init(void) {
