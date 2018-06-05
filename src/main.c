@@ -3,6 +3,7 @@
 #include "fifos.h"
 #include "i2c.h"
 #include "mrt.h"
+#include "iap.h"
 #include "os.h"
 #include "os-asm.h"
 #include "pll.h"

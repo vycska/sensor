@@ -1,6 +1,7 @@
 #include "task_command_parser.h"
 #include "bme280.h"
 #include "fifos.h"
+#include "iap.h"
 #include "onewire.h"
 #include "os.h"
 #include "utils.h"
@@ -178,6 +179,20 @@ void Task_Command_Parser(void) {
          }
          case 0xed5: {          //psr
             mysprintf(buf, "0x%x", GetPSR());
+            Fifo_Uart0_Put(buf, &smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
+            break;
+         }
+         case 0x7f7e: { //iap_info
+            int len;
+            unsigned int result;
+
+            result = iap_read_part_id();
+            len = mysprintf(&buf[0], "Part id: 0x%x\r\n", result);
+            result = iap_read_boot_code_version();
+            len += mysprintf(&buf[len], "Boot code version: %d.%d\r\n", (result >> 8) & 0xff, result & 0xff);
+            result = (unsigned int)iap_read_uid();
+            len += mysprintf(&buf[len], "UID: %u %u %u %u", *((unsigned int *)result + 0), *((unsigned int *)result + 1), *((unsigned int *)result + 2), *((unsigned int *)result + 3));
             Fifo_Uart0_Put(buf, &smphrFinished);
             OS_Blocking_Wait(&smphrFinished);
             break;
