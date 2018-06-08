@@ -63,7 +63,7 @@ void Task_Oled(void) {
       u8g2_DrawStr(&u8g2,2,58,buf);
 
       u8g2_SetFont(&u8g2,u8g2_font_5x8_tf);
-      v = adc/4095.0*3.3;
+      v = adc/4095.0*3.3 * 2;
       mysprintf(buf,"%f2V",(char*)&v);
       u8g2_DrawStr(&u8g2,0,8,buf);
 
@@ -77,15 +77,15 @@ void Task_Oled(void) {
 uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8,uint8_t msg,uint8_t arg_int,void *arg_ptr) {
    switch(msg) {
       case U8X8_MSG_GPIO_AND_DELAY_INIT: //called once during init phase of u8g2; can be used to setup pins
-         PINENABLE0 |= (1<<1 | 1<<9); //ACMP_I2 and CLKIN disabled on pin PIO0_1
-         //SDA
-         PIO0_1 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11); //no pd/pu, hysteresis disable, input not inverted, open drain mode, bypass input filter
-         //SCL
-         PIO0_15 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11); //no pd/pu, hysteresis disable, input not inverted, open drain mode, bypass input filter
+         PINENABLE0 |= (1<<22 | 1<<23); //ADC_9 disabled on PIO0_17, ADC_10 disabled on PIO0_13
+         //SDA is PIO0_17
+         PIO0_17 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11 | 0<<13); //no pd/pu, hysteresis disable, input not inverted, open drain mode, bypass input filter, IOCONCLKDIV0
+         //SCL is PIO0_13
+         PIO0_13 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11 | 0<<13); //no pd/pu, hysteresis disable, input not inverted, open drain mode, bypass input filter, IOCONCLKDIV0
          //direction is output
-         DIR0 |= (1<<1 | 1<<15);
+         DIR0 |= (1<<13 | 1<<17);
          //initially released
-         SET0 = (1<<1 | 1<<15);
+         SET0 = (1<<13 | 1<<17);
          break;
       case U8X8_MSG_DELAY_100NANO: //delay arg_int*100 nano seconds
          MRT1_Delay(arg_int*100);
@@ -100,12 +100,12 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8,uint8_t msg,uint8_t arg_int,void *arg_p
          MRT1_Delay(5.0/arg_int*1000);
          break;
       case U8X8_MSG_GPIO_I2C_CLOCK: //arg_int=0: output low at I2C clock pin; arg_int=1: input dir with pullup high for I2C clock pin
-         if(arg_int==0) CLR0 = (1<<15);
-         else SET0 = (1<<15);
+         if(arg_int==0) CLR0 = (1<<13);
+         else SET0 = (1<<13);
          break;
       case U8X8_MSG_GPIO_I2C_DATA: //arg_int=0: output low at I2C data pin; arg_int=1: input dir with pullup high for I2C data pin
-         if(arg_int==0) CLR0 = (1<<1);
-         else SET0 = (1<<1);
+         if(arg_int==0) CLR0 = (1<<17);
+         else SET0 = (1<<17);
          break;
       default:
          u8x8_SetGPIOResult(u8x8,1); //default return value

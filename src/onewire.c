@@ -4,23 +4,23 @@
 #include "lpc824.h"
 
 void onewire_init(void) {
-   //pin for 1-wire P0.13
-   PINENABLE0 |= (1<<23); //ADC_10 disabled on pin PIO0_13
-   PIO0_13 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11); //no pd/pu, disable hysteresis, input not inverted, open drain mode, bypass input filter
-   DIR0 |= (1<<13); //output direction
-   SET0 = (1<<13); //at start line is released
+   //pin for 1-wire P0.9
+   PINENABLE0 |= (1<<7); //XTALOUT disabled on PIO0_9
+   PIO0_9 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11 | 0<<13); //no pd/pu, disable hysteresis, input not inverted, open drain mode, bypass input filter, IOCONCLKDIV0
+   DIR0 |= (1<<9); //output direction
+   SET0 = (1<<9); //at start line is released
 }
 
 void onewire_drivelinelow(void) {
-   CLR0 = (1<<13);
+   CLR0 = (1<<9);
 }
 
 void onewire_releaseline(void) {
-   SET0 = (1<<13);
+   SET0 = (1<<9);
 }
 
 unsigned char onewire_getlinevalue(void) {
-   return (PIN0>>13)&1;
+   return (PIN0>>9)&1;
 }
 
 void onewire_delay(int us) {
