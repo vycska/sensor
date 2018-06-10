@@ -337,6 +337,21 @@
 #define DIRCLR0                        (*((volatile uint32_t*)0xa0002400)) //clear pin direction bits for port 0
 #define DIRNOT0                        (*((volatile uint32_t*)0xa0002480)) //toggle pin direction bits for port 0
 
+//pin interrupts and pattern match engine
+#define ISEL                           (*((volatile uint32_t*)0xa0004000)) //pin interrupt mode register
+#define IENR                           (*((volatile uint32_t*)0xa0004004)) //pin interrupt level or rising edge interrupt enable register
+#define SIENR                          (*((volatile uint32_t*)0xa0004008)) //pin interrupt level or rising edge interrupt set register
+#define CIENR                          (*((volatile uint32_t*)0xa000400c)) //pin interrupt level (rising edge interrupt) clear register
+#define IENF                           (*((volatile uint32_t*)0xa0004010)) //pin interrupt active level or falling edge interrupt enable register
+#define SIENF                          (*((volatile uint32_t*)0xa0004014)) //pin interrupt active level or falling edge interrupt set register
+#define CIENF                          (*((volatile uint32_t*)0xa0004018)) //pin interrupt active level or falling edge interrupt clear register
+#define RISE                           (*((volatile uint32_t*)0xa000401C)) //pin interrupt rising edge register
+#define FALL                           (*((volatile uint32_t*)0xa0004020)) //pin interrupt falling edge register
+#define IST                            (*((volatile uint32_t*)0xa0004024)) //pin interrupt status register
+#define PMCTRL                         (*((volatile uint32_t*)0xa0004028)) //pattern match interrupt control register
+#define PMSRC                          (*((volatile uint32_t*)0xa000402C)) //pattern match interrupt bit-slice source register
+#define PMCFG                          (*((volatile uint32_t*)0xa0004030)) //pattern match interrupt bit slice configuration register
+
 //SysTick timer
 #define SYST_CSR                       (*((volatile uint32_t*)0xe000e010)) //system timer control and status register
 #define SYST_RVR                       (*((volatile uint32_t*)0xe000e014)) //system timer reload value register

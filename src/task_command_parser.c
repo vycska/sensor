@@ -2,6 +2,7 @@
 #include "bme280.h"
 #include "fifos.h"
 #include "iap.h"
+#include "led.h"
 #include "onewire.h"
 #include "os.h"
 #include "utils.h"
@@ -18,6 +19,7 @@ int params_integer(char,unsigned int*);
 
 extern volatile long long int millis;
 extern struct BME280_Config bme280_config;
+extern struct LED_Data led_data;
 extern struct tcb *RunPt;
 extern struct tcb tcbs[NUMTHREADS];
 
@@ -37,24 +39,24 @@ void Task_Command_Parser(void) {
       memset(params, 0, sizeof(params));
       params_fill(pString, params);
 
-      switch (crc16((unsigned char *)params[1], strlen((char *)params[1]))) {
-         case 0x178a: {         //system_reset
+      switch(crc16((unsigned char *)params[1], strlen((char *)params[1]))) {
+         case 0x178a: { //system_reset
             SystemReset();
             break;
          }
-         case 0x57e6: {         //millis
+         case 0x57e6: { //millis
             mysprintf(buf, "%l", (char *)&millis);
             Fifo_Uart0_Put(buf, &smphrFinished);
             OS_Blocking_Wait(&smphrFinished);
             break;
          }
-         case 0xd89c: {         //live_time
+         case 0xd89c: { //live_time
             mysprintf(buf, "%d,%d:%d:%d", (int)(millis / 1000 / 60 / 60 / 24), (int)(millis / 1000 / 60 / 60 % 24), (int)(millis / 1000 / 60 % 60), (int)(millis / 1000 % 60));
             Fifo_Uart0_Put(buf, &smphrFinished);
             OS_Blocking_Wait(&smphrFinished);
             break;
          }
-         case 0xca53: {         //task_info
+         case 0xca53: { //task_info
             for(i = 0; i < NUMTHREADS; i++) {
                mysprintf(buf, "%d %s %n pr: %d %n sp: %x sl: %d %n bl: %x",
                (int)tcbs[i].id, tcbs[i].name, 20-strlen(tcbs[i].name), (int)tcbs[i].priority, 4-ndigits(tcbs[i].priority), tcbs[i].sp, tcbs[i].sleep, 7-ndigits(tcbs[i].sleep), tcbs[i].block);
@@ -63,7 +65,7 @@ void Task_Command_Parser(void) {
             }
             break;
          }
-         case 0xa577:{         //bme280_config
+         case 0xa577: { //bme280_config
             mysprintf(buf, "dig_T1: %d", (int)bme280_config.dig_T1);
             Fifo_Uart0_Put(buf, &smphrFinished);
             OS_Blocking_Wait(&smphrFinished);
@@ -177,7 +179,7 @@ void Task_Command_Parser(void) {
             OS_Blocking_Wait(&smphrFinished);
             break;
          }
-         case 0xed5: {          //psr
+         case 0xed5: { //psr
             mysprintf(buf, "0x%x", GetPSR());
             Fifo_Uart0_Put(buf, &smphrFinished);
             OS_Blocking_Wait(&smphrFinished);
@@ -197,10 +199,31 @@ void Task_Command_Parser(void) {
             OS_Blocking_Wait(&smphrFinished);
             break;
          }
-         case 0xe89e: {         //crc16
+         case 0xfb7e: { //led_enabled
+            led_data.enabled ^= 1;
+            if(!led_data.enabled) {
+               led_data.counter = 0;
+               LED_Off();
+            }
+            break;
+         }
+         case 0xb400: { //led_dc
+            led_data.counter = 0;
+            led_data.dc = params[2];
+            break;
+         }
+         case 0x4d2c:{ //led_period
+            led_data.counter = 0;
+            led_data.period = params[2];
+            break;
+         }
+         case 0xe89e: { //crc16
             mysprintf(buf, "0x%x", (unsigned int)crc16((unsigned char *)params[2], strlen((char *)params[2])));
             Fifo_Uart0_Put(buf, &smphrFinished);
             OS_Blocking_Wait(&smphrFinished);
+            break;
+         }
+         case 0xbf26: { //temp
             break;
          }
          default: {
@@ -218,7 +241,7 @@ void params_fill(char *s, unsigned int *params) {
    int i;                       //iterator
 
    for(p = s, d = 1, k = 0, l = strlen(s), i = 0; i <= l; i++) {
-      if(s[i] == ':' || i == l) {
+      if(s[i] == ' ' || i == l) {
          s[i] = 0;
          params[k + 1] = d ? (params[0] |= (1 << (16 + k)), atoi(p)) : (unsigned int)p;
          k += 1;

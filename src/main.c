@@ -2,8 +2,9 @@
 #include "adc.h"
 #include "fifos.h"
 #include "i2c.h"
-#include "mrt.h"
 #include "iap.h"
+#include "led.h"
+#include "mrt.h"
 #include "os.h"
 #include "os-asm.h"
 #include "pll.h"
@@ -12,6 +13,7 @@
 #include "task_ds18b20.h"
 #include "task_idle.h"
 #include "task_oled.h"
+#include "task_switch.h"
 #include "task_uart0_output.h"
 #include "uart.h"
 #include "utils-asm.h"
@@ -32,10 +34,7 @@ void main(void) {
    I2C0_Init();
    UART0_Init();
    MRT2_Init(1000);
-
-   PINENABLE0 |= (1<<3 | 1<<16); //ACMP_I4 and ADC_3 disabled on pin PIO0_23
-   PIO0_23 = (0<<3 | 0<<5 | 0<<6 | 0<<10 | 0<<11 | 0<<13); //no pu/pd, disable hysteresis, input not inverted, disable od, bypass input filter, peripheral clock divider 0
-   DIR0 |= (1<<23); //set output direction
+   LED_Init();
 
    Fifo_Uart0_Init();
    Fifo_Command_Parser_Init();
@@ -44,11 +43,12 @@ void main(void) {
    OS_InitSemaphore(&mtx_mrt1,1);
 
    OS_Init(NUMTHREADS,
-         "uart0_output",8,Task_Uart0_Output,
-         "bme280",10,Task_BME280,
+         "switch",3,Task_Switch,
+         "bme280",6,Task_BME280,
          "ds18b20",6,Task_DS18B20,
-         "command_parser",9,Task_Command_Parser,
-         "oled",6,Task_Oled,
+         "oled",7,Task_Oled,
+         "uart0_output",8,Task_Uart0_Output,
+         "command_parser",8,Task_Command_Parser,
          "idle",31,Task_Idle);
    OS_Start();
 }

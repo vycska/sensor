@@ -128,3 +128,7 @@ void OS_Sleep(int ms) {
    RunPt->sleep = ms;
    OS_Suspend();
 }
+
+void OS_Unsleep(struct tcb *task) {
+   task->sleep = 0;
+}

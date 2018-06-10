@@ -1,31 +1,40 @@
 #include "task_oled.h"
+#include "adc.h"
 #include "fifos.h"
 #include "os.h"
 #include "task_bme280.h"
 #include "task_ds18b20.h"
+#include "task_switch.h"
 #include "mrt.h"
 #include "u8g2.h"
+#include "utils-asm.h"
 #include "utils.h"
 #include "lpc824.h"
 
 uint8_t u8x8_gpio_and_delay(u8x8_t*,uint8_t,uint8_t,void*);
 
-extern volatile int adc;
-extern struct Task_DS18B20_Data task_ds18b20_data;
+extern volatile long long int millis;
+extern struct tcb *RunPt;
+extern struct ADC_Data adc_data;
 extern struct Task_BME280_Data task_bme280_data;
+extern struct Task_DS18B20_Data task_ds18b20_data;
+extern struct Task_Switch_Data task_switch_data;
 
+struct Task_Oled_Data task_oled_data = {0,5};
 u8g2_t u8g2; //a structure which contains all the data for one display
 
 void Task_Oled(void) {
-   char buf[64];
-   int state=0;
+   char buf[96],buf2[16];
+   long long int switch_duration;
    double v;
 
    Fifo_Uart0_Put("Task_Oled has started",0);
 
+   DisableInterrupts();
    u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2,U8G2_R0,u8x8_byte_sw_i2c,u8x8_gpio_and_delay); //init u8g2 structure
    u8g2_InitDisplay(&u8g2); //send init sequence to the display, display is in sleep mode
    u8g2_SetPowerSave(&u8g2,0); //wake up display
+   EnableInterrupts();
 
    u8g2_ClearBuffer(&u8g2);
 
@@ -40,37 +49,48 @@ void Task_Oled(void) {
 
    while(1) {
       u8g2_ClearBuffer(&u8g2);
-      
-      u8g2_SetFont(&u8g2,u8g2_font_fur25_tf);
-      switch(state) {
+
+      switch(task_oled_data.screen) {
          case 0:
-            v=task_ds18b20_data.temperature/100.0;
-            mysprintf(buf,"%f1%s",(char*)&v,"\xb0""C");
+            mysprintf(buf,"ds18b20: temper., %s","\xb0""C");
+            if(task_ds18b20_data.temperature!=DS18B20_ERROR_TEMPERATURE) {
+               v=task_ds18b20_data.temperature/100.0;
+               mysprintf(buf2,"%f1",(char*)&v);
+            }
+            else
+               mysprintf(buf2,"**.*");
             break;
          case 1:
+            mysprintf(buf,"bme280: temper., %s","\xb0""C");
             v = task_bme280_data.t/100.0;
-            mysprintf(buf,"%f1%s",(char*)&v,"\xb0""C");
+            mysprintf(buf2,"%f1",(char*)&v);
             break;
          case 2:
+            mysprintf(buf,"bme280: dregme, %%");
             v = task_bme280_data.h/100.0;
-            mysprintf(buf,"%f1%%",(char*)&v);
+            mysprintf(buf2,"%f1",(char*)&v);
             break;
          case 3:
+            mysprintf(buf,"bme280: slegis, mmHg");
             v = task_bme280_data.p/100.0;
-            mysprintf(buf,"%f1mm",(char*)&v);
+            mysprintf(buf2,"%f1",(char*)&v);
+            break;
+         case 4: //adc
+            mysprintf(buf,"Li-Ion baterija, V");
+            v = ((double)adc_data.sum/adc_data.count)/4095.0*3.3 * 2;
+            mysprintf(buf2,"%f2",(char*)&v);
             break;
       }
-      u8g2_DrawStr(&u8g2,2,58,buf);
-
-      u8g2_SetFont(&u8g2,u8g2_font_5x8_tf);
-      v = adc/4095.0*3.3 * 2;
-      mysprintf(buf,"%f2V",(char*)&v);
+      u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
+      if(task_switch_data.active && (switch_duration=millis-task_switch_data.start)>=10000)
+         mysprintf(buf,"***");
       u8g2_DrawStr(&u8g2,0,8,buf);
+      u8g2_SetFont(&u8g2,u8g2_font_fur35_tn);
+      u8g2_DrawStr(&u8g2,2,62,buf2);
 
       u8g2_SendBuffer(&u8g2);
 
-      state = (state+1)%4;
-      OS_Sleep(1500);
+      OS_Sleep(500);
    }
 }
 

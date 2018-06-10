@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define NUMTHREADS	6      // number of threads
+#define NUMTHREADS	7      // number of threads
 #define STACKSIZE	160    // number of 32-bit words in stack
 
 struct tcb {
@@ -18,6 +18,7 @@ void Scheduler(void);
 
 void OS_Suspend(void);
 void OS_Sleep(int);
+void OS_Unsleep(struct tcb*);
 
 void OS_InitSemaphore(int *, int);
 

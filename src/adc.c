@@ -1,8 +1,9 @@
 #include "adc.h"
 #include "main.h"
+#include "utils.h"
 #include "lpc824.h"
 
-volatile int adc;
+struct ADC_Data adc_data;
 
 void ADC_Init(void) {
    ADCSEQA_CTRL &= (~(1u<<31)); //disable sequence A
@@ -23,5 +24,9 @@ void ADC_Init(void) {
 
 void ADC_SEQA_IRQHandler(void) {
    ADCFLAGS = (1<<28); //clear sequence A end of sequence interrupt flag
-   adc = (ADCDAT2>>4)&0xfff;
+   adc_data.sum -= adc_data.data[adc_data.index];
+   adc_data.data[adc_data.index] = (ADCDAT2>>4)&0xfff;
+   adc_data.sum += adc_data.data[adc_data.index];
+   adc_data.index = (adc_data.index+1)%ADC_TOTAL_DATA;
+   adc_data.count = MIN2(adc_data.count+1,ADC_TOTAL_DATA);
 }

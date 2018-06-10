@@ -34,15 +34,15 @@ void Task_BME280(void) {
       OS_Sleep(1.25 + 2.5 * power(2, bme280_config.os_t - 1) + 2.3 * power(2, bme280_config.os_p - 1) + 0.575 + 2.3 * power(2, bme280_config.os_h - 1) + 0.575);
       BME280_GetValue(&h, &p, &t);
 
-      mysprintf(s, "T: %f1 C", (char *)&t);
-      Fifo_Uart0_Put(s, &smphrFinished);
-      OS_Blocking_Wait(&smphrFinished);
-      mysprintf(s, "P: %f1 mmHg", (char *)&p);
-      Fifo_Uart0_Put(s, &smphrFinished);
-      OS_Blocking_Wait(&smphrFinished);
-      mysprintf(s, "H: %f1 %%", (char *)&h);
-      Fifo_Uart0_Put(s, &smphrFinished);
-      OS_Blocking_Wait(&smphrFinished);
+      //mysprintf(s, "T: %f1 C", (char *)&t);
+      //Fifo_Uart0_Put(s, &smphrFinished);
+      //OS_Blocking_Wait(&smphrFinished);
+      //mysprintf(s, "P: %f1 mmHg", (char *)&p);
+      //Fifo_Uart0_Put(s, &smphrFinished);
+      //OS_Blocking_Wait(&smphrFinished);
+      //mysprintf(s, "H: %f1 %%", (char *)&h);
+      //Fifo_Uart0_Put(s, &smphrFinished);
+      //OS_Blocking_Wait(&smphrFinished);
 
       task_bme280_data.h = h * 100;
       task_bme280_data.p = p * 100;
