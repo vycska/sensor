@@ -5,6 +5,8 @@
 #include "led.h"
 #include "onewire.h"
 #include "os.h"
+#include "switch.h"
+#include "task_switch.h"
 #include "utils.h"
 #include "utils-asm.h"
 #include "lpc824.h"
@@ -20,6 +22,8 @@ int params_integer(char,unsigned int*);
 extern volatile long long int millis;
 extern struct BME280_Config bme280_config;
 extern struct LED_Data led_data;
+extern struct Dump dump;
+extern struct Task_Switch_Data task_switch_data;
 extern struct tcb *RunPt;
 extern struct tcb tcbs[NUMTHREADS];
 
@@ -63,6 +67,12 @@ void Task_Command_Parser(void) {
                Fifo_Uart0_Put(buf, &smphrFinished);
                OS_Blocking_Wait(&smphrFinished);
             }
+            break;
+         }
+         case 0x8b8b: { //switch
+            mysprintf(buf, "params[1]: %s, params[2]: %u",(char*)params[1],params[2]);
+            Fifo_Uart0_Put(buf,&smphrFinished);
+            OS_Blocking_Wait(&smphrFinished);
             break;
          }
          case 0xa577: { //bme280_config
@@ -224,6 +234,11 @@ void Task_Command_Parser(void) {
             break;
          }
          case 0xbf26: { //temp
+            for(i=0;i<20;i++) {
+               mysprintf(buf,"[%d]: %l",i,(char*)&dump.millis[i]);
+               Fifo_Uart0_Put(buf,&smphrFinished);
+               OS_Blocking_Wait(&smphrFinished);
+            }
             break;
          }
          default: {

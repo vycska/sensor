@@ -25,7 +25,6 @@ u8g2_t u8g2; //a structure which contains all the data for one display
 
 void Task_Oled(void) {
    char buf[96],buf2[16];
-   long long int switch_duration;
    double v;
 
    Fifo_Uart0_Put("Task_Oled has started",0);
@@ -82,8 +81,6 @@ void Task_Oled(void) {
             break;
       }
       u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
-      if(task_switch_data.active && (switch_duration=millis-task_switch_data.start)>=10000)
-         mysprintf(buf,"***");
       u8g2_DrawStr(&u8g2,0,8,buf);
       u8g2_SetFont(&u8g2,u8g2_font_fur35_tn);
       u8g2_DrawStr(&u8g2,2,62,buf2);

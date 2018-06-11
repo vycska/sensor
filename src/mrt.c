@@ -2,12 +2,17 @@
 #include "led.h"
 #include "main.h"
 #include "os.h"
+#include "switch.h"
+#include "task_switch.h"
 #include "utils.h"
 #include "lpc824.h"
 
+extern int smphr_switch;
 extern volatile long long int millis;
 extern struct tcb *RunPt;
 extern struct LED_Data led_data;
+extern struct Switch_Data switch_data;
+extern struct Task_Switch_Data task_switch_data;
 
 void MRT0_Init(void) {
    IPR2 = (IPR2&(~(3<<22))) | (0<<22); //priority 0 (highest)
@@ -33,6 +38,13 @@ void MRT_IRQHandler(void) {
          else if(led_data.counter >= led_data.period) {
             led_data.counter = 0;
             LED_On();
+         }
+      }
+      //process switch
+      if(switch_data.active && !Switch_Pressed()) {
+         switch_data.active = 0;
+         task_switch_data.duration = millis-task_switch_data.start;
+         if(task_switch_data.duration>=1000) {
          }
       }
    }
