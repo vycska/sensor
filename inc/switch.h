@@ -7,7 +7,8 @@ struct Dump {
 };
 
 struct Switch_Data {
-   volatile int active;
+   int active,duration;
+   long long int start;
 };
 
 void Switch_Init(void);

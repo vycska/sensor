@@ -2,12 +2,11 @@
 #include "os.h"
 #include "lpc824.h"
 
-struct Dump dump;
-
 extern int smphr_switch;
 extern volatile long long int millis;
 
-struct Switch_Data switch_data;
+struct Dump dump;
+volatile struct Switch_Data switch_data;
 
 void Switch_Init(void) {
    PINENABLE0 |= (1<<4); //SWCLK disabled on PIO0_3
@@ -28,12 +27,16 @@ int Switch_Pressed(void) {
 
 void PININT0_IRQHandler(void) {
    RISE = (1<<0);
-   CIENR = (1<<0); //disable rising edge interrupt for pin selected in PINTSEL0
+   if(millis-switch_data.start >= 500) {
+      switch_data.active = 1;
+      switch_data.start = millis;
+      CIENR = (1<<0); //disable rising edge interrupt for pin selected in PINTSEL0
+      OS_Blocking_Signal(&smphr_switch);
+      OS_Suspend();
+
+   }
    if(dump.index<100) {
       dump.millis[dump.index] = millis;
       dump.index += 1;
    }
-   switch_data.active = 1;
-   OS_Blocking_Signal(&smphr_switch);
-   OS_Suspend();
 }
