@@ -5,9 +5,9 @@
 #include "utils.h"
 #include <string.h>
 
-extern struct BME280_Config bme280_config;
+extern struct BME280_Data bme280_data;
 
-struct Task_BME280_Data task_bme280_data;
+struct Task_BME280_Data task_bme280_data = {BME280_ERROR_VALUE, BME280_ERROR_VALUE, BME280_ERROR_VALUE};
 
 void Task_BME280(void) {
    char s[24];
@@ -31,7 +31,7 @@ void Task_BME280(void) {
 
    while(1) {
       BME280_StartForcedMeasurement();
-      OS_Sleep(1.25 + 2.5 * power(2, bme280_config.os_t - 1) + 2.3 * power(2, bme280_config.os_p - 1) + 0.575 + 2.3 * power(2, bme280_config.os_h - 1) + 0.575);
+      OS_Sleep(1.25 + 2.5 * power(2, bme280_data.os_t - 1) + 2.3 * power(2, bme280_data.os_p - 1) + 0.575 + 2.3 * power(2, bme280_data.os_h - 1) + 0.575);
       BME280_GetValue(&h, &p, &t);
 
       //mysprintf(s, "T: %f1 C", (char *)&t);

@@ -3,7 +3,7 @@
 
 #define BME280_SLAVE (0x76)
 
-struct BME280_Config {
+struct BME280_Data {
    unsigned short dig_T1;       //28044
    signed short dig_T2;         //25822
    signed short dig_T3;         //50

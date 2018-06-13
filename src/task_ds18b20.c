@@ -8,7 +8,7 @@
 #include "lpc824.h"
 #include <string.h>
 
-struct Task_DS18B20_Data task_ds18b20_data;
+struct Task_DS18B20_Data task_ds18b20_data = {DS18B20_ERROR_VALUE};
 
 void Task_DS18B20(void) {
    char s[80];
@@ -35,7 +35,7 @@ void Task_DS18B20(void) {
       DS18B20_ConvertTAll();
       OS_Sleep(750); //conversion time
       k = DS18B20_ReadScratchpad(0,data);
-      task_ds18b20_data.temperature = (k==DS18B20_OK ? DS18B20_GetTemperature(data)*100 : DS18B20_ERROR_TEMPERATURE);
+      task_ds18b20_data.temperature = (k==DS18B20_OK ? DS18B20_GetTemperature(data)*100 : DS18B20_ERROR_VALUE);
       OS_Sleep(1000);
    }
 }

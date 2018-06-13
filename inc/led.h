@@ -2,7 +2,7 @@
 #define __LED_H__
 
 struct LED_Data {
-   volatile int enabled,counter,dc,period;
+   int enabled,counter,dc,period;
 };
 
 void LED_Init(void);

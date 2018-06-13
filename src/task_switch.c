@@ -10,7 +10,6 @@
 
 extern volatile long long int millis;
 extern volatile struct Switch_Data switch_data;
-extern struct Task_Oled_Data task_oled_data;
 
 int smphr_switch;
 
@@ -27,11 +26,24 @@ void Task_Switch(void) {
       OS_Blocking_Wait(&smphr_switch);
       switch(switch_data.active) {
          case 1:
-            task_oled_data.screen = (task_oled_data.screen+1)%task_oled_data.total_screens;
+            Fifo_Command_Parser_Put("screen 1");
             break;
          case 0:
             mysprintf(buf,"switch %d",switch_data.duration);
+            //output(buf,eOutputSwitch,1);
             Fifo_Command_Parser_Put(buf);
+            switch(switch_data.duration/4000) {
+               case 1:
+                  Fifo_Command_Parser_Put("led_enabled");
+                  break;
+               case 2:
+                  Fifo_Command_Parser_Put("screen 0");
+                  Fifo_Command_Parser_Put("config_save");
+                  break;
+               case 3:
+                  Fifo_Command_Parser_Put("uart_in_enabled");
+                  break;
+            }
             RISE = (1<<0);
             SIENR = (1<<0); //enable rising edge interrupt for pin selected in PINTSEL0; this is indirect register which operates on IENR register
             break;

@@ -6,7 +6,6 @@
 extern int smphr_switch;
 extern volatile long long int millis;
 
-volatile struct Dump dump;
 volatile struct Switch_Data switch_data;
 
 void Switch_Init(void) {
@@ -27,13 +26,9 @@ int Switch_Pressed(void) {
 }
 
 void PININT0_IRQHandler(void) {
-   if(dump.index<20) {
-      dump.millis[dump.index] = millis;
-      dump.index += 1;
-   }
-   RISE = (1<<0);
+   CIENR = (1<<0); //disable rising edge interrupt for pin selected in PINTSEL0
+   RISE = (1<<0); //clear rising edge detection
    if(switch_data.active==0) {
-      CIENR = (1<<0); //disable rising edge interrupt for pin selected in PINTSEL0
       switch_data.active = 1;
       switch_data.delay = 0;
       switch_data.start = millis;

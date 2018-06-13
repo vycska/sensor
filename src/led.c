@@ -1,7 +1,7 @@
 #include "led.h"
 #include "lpc824.h"
 
-struct LED_Data led_data = {1,0,50,1000};
+volatile struct LED_Data led_data = {1,0,50,1000};
 
 void LED_Init(void) {
    PINENABLE0 |= (1<<3 | 1<<16); //ACMP_I4 and ADC_3 disabled on pin PIO0_23

@@ -5,9 +5,8 @@
 
 void UART0_Init(void);
 void UART0_Transmit(char *, int);
-void UART0_IRQHandler(void);
 
-struct sUART_In {
+struct UART_Data {
    char s[UART_IN_MAX];
    int i;
 };

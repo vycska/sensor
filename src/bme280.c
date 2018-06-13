@@ -7,7 +7,7 @@
 
 extern int mtx_i2c0;
 
-struct BME280_Config bme280_config;
+struct BME280_Data bme280_data;
 
 int BME280_RegisterRead(unsigned int r, unsigned char *d, int l) {
    unsigned char reg[1];
@@ -48,73 +48,73 @@ int BME280_RegisterWrite(unsigned int r, unsigned char *d, int l) {
 void BME280_Init(void) {
    unsigned char data[2] = { 0 };
 
-   bme280_config.os_h = bme280_config.os_p = bme280_config.os_t = 3;    // oversampling is x4 [but note value is 3]
+   bme280_data.os_h = bme280_data.os_p = bme280_data.os_t = 3;    // oversampling is x4 [but note value is 3]
 
-   data[0] = bme280_config.os_h;
+   data[0] = bme280_data.os_h;
    BME280_RegisterWrite(0xf2, data, 1);
 
-   data[0] = (bme280_config.os_t << 5) | (bme280_config.os_p << 2);
+   data[0] = (bme280_data.os_t << 5) | (bme280_data.os_p << 2);
    BME280_RegisterWrite(0xf4, data, 1);
 
    BME280_RegisterRead(0x88, data, 2);
-   bme280_config.dig_T1 = (data[1] << 8) | data[0];
+   bme280_data.dig_T1 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x8a, data, 2);
-   bme280_config.dig_T2 = (data[1] << 8) | data[0];
+   bme280_data.dig_T2 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x8c, data, 2);
-   bme280_config.dig_T3 = (data[1] << 8) | data[0];
+   bme280_data.dig_T3 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x8e, data, 2);
-   bme280_config.dig_P1 = (data[1] << 8) | data[0];
+   bme280_data.dig_P1 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x90, data, 2);
-   bme280_config.dig_P2 = (data[1] << 8) | data[0];
+   bme280_data.dig_P2 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x92, data, 2);
-   bme280_config.dig_P3 = (data[1] << 8) | data[0];
+   bme280_data.dig_P3 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x94, data, 2);
-   bme280_config.dig_P4 = (data[1] << 8) | data[0];
+   bme280_data.dig_P4 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x96, data, 2);
-   bme280_config.dig_P5 = (data[1] << 8) | data[0];
+   bme280_data.dig_P5 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x98, data, 2);
-   bme280_config.dig_P6 = (data[1] << 8) | data[0];
+   bme280_data.dig_P6 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x9a, data, 2);
-   bme280_config.dig_P7 = (data[1] << 8) | data[0];
+   bme280_data.dig_P7 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x9c, data, 2);
-   bme280_config.dig_P8 = (data[1] << 8) | data[0];
+   bme280_data.dig_P8 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0x9e, data, 2);
-   bme280_config.dig_P9 = (data[1] << 8) | data[0];
+   bme280_data.dig_P9 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0xa1, data, 1);
-   bme280_config.dig_H1 = data[0];
+   bme280_data.dig_H1 = data[0];
 
    BME280_RegisterRead(0xe1, data, 2);
-   bme280_config.dig_H2 = (data[1] << 8) | data[0];
+   bme280_data.dig_H2 = (data[1] << 8) | data[0];
 
    BME280_RegisterRead(0xe3, data, 1);
-   bme280_config.dig_H3 = data[0];
+   bme280_data.dig_H3 = data[0];
 
    BME280_RegisterRead(0xe4, data, 2);
-   bme280_config.dig_H4 = (data[0] << 4) | (data[1] & 0xf);
+   bme280_data.dig_H4 = (data[0] << 4) | (data[1] & 0xf);
 
    BME280_RegisterRead(0xe5, data, 2);
-   bme280_config.dig_H5 = (data[1] << 4) | ((data[0] >> 4) & 0xf);
+   bme280_data.dig_H5 = (data[1] << 4) | ((data[0] >> 4) & 0xf);
 
    BME280_RegisterRead(0xe7, data, 1);
-   bme280_config.dig_H6 = data[0];
+   bme280_data.dig_H6 = data[0];
 }
 
 void BME280_StartForcedMeasurement(void) {
    unsigned char data[1];
 
-   data[0] = (bme280_config.os_t << 5) | (bme280_config.os_p << 2) | 1;
+   data[0] = (bme280_data.os_t << 5) | (bme280_data.os_p << 2) | 1;
    BME280_RegisterWrite(0xf4, data, 1);
 }
 
@@ -122,15 +122,15 @@ void BME280_GetValue(double *h, double *p, double *t) {
    unsigned char data[8] = { 0 };
 
    BME280_RegisterRead(0xf7, data, 8);
-   bme280_config.adc_P = (((unsigned int)data[0]) << 12) | (((unsigned int)data[1]) << 4) | (((unsigned int)data[2]) >> 4);
-   bme280_config.adc_T = (((unsigned int)data[3]) << 12) | (((unsigned int)data[4]) << 4) | (((unsigned int)data[5]) >> 4);
-   bme280_config.adc_H = (((unsigned int)data[6]) << 8) | ((unsigned int)data[7]);
-   bme280_config.T = BME280_compensate_T_int32(bme280_config.adc_T);
-   bme280_config.P = BME280_compensate_P_int64(bme280_config.adc_P);
-   bme280_config.H = BME280_compensate_H_int32(bme280_config.adc_H);
-   *h = (double)bme280_config.H / 1024.0;
-   *p = (double)bme280_config.P / 256.0 * 0.0075006;    //1 atm [standard atmosphere] = 760 torr = 101325 Pa = 1.01325 bar; 1 mmHg = 133.322387415 Pa --> 1 Pa = 0.0075006 mmHg
-   *t = (double)bme280_config.T / 100.0;
+   bme280_data.adc_P = (((unsigned int)data[0]) << 12) | (((unsigned int)data[1]) << 4) | (((unsigned int)data[2]) >> 4);
+   bme280_data.adc_T = (((unsigned int)data[3]) << 12) | (((unsigned int)data[4]) << 4) | (((unsigned int)data[5]) >> 4);
+   bme280_data.adc_H = (((unsigned int)data[6]) << 8) | ((unsigned int)data[7]);
+   bme280_data.T = BME280_compensate_T_int32(bme280_data.adc_T);
+   bme280_data.P = BME280_compensate_P_int64(bme280_data.adc_P);
+   bme280_data.H = BME280_compensate_H_int32(bme280_data.adc_H);
+   *h = (double)bme280_data.H / 1024.0;
+   *p = (double)bme280_data.P / 256.0 * 0.0075006;    //1 atm [standard atmosphere] = 760 torr = 101325 Pa = 1.01325 bar; 1 mmHg = 133.322387415 Pa --> 1 Pa = 0.0075006 mmHg
+   *t = (double)bme280_data.T / 100.0;
 }
 
 int BME280_GetID(unsigned char *id) {
@@ -141,10 +141,10 @@ int BME280_GetID(unsigned char *id) {
 int BME280_compensate_T_int32(int adc_T) {
    int var1, var2, T;
 
-   var1 = ((((adc_T >> 3) - ((int)bme280_config.dig_T1 << 1))) * ((int)bme280_config.dig_T2)) >> 11;
-   var2 = (((((adc_T >> 4) - ((int)bme280_config.dig_T1)) * ((adc_T >> 4) - ((int)bme280_config.dig_T1))) >> 12) * ((int)bme280_config.dig_T3)) >> 14;
-   bme280_config.t_fine = var1 + var2;
-   T = (bme280_config.t_fine * 5 + 128) >> 8;
+   var1 = ((((adc_T >> 3) - ((int)bme280_data.dig_T1 << 1))) * ((int)bme280_data.dig_T2)) >> 11;
+   var2 = (((((adc_T >> 4) - ((int)bme280_data.dig_T1)) * ((adc_T >> 4) - ((int)bme280_data.dig_T1))) >> 12) * ((int)bme280_data.dig_T3)) >> 14;
+   bme280_data.t_fine = var1 + var2;
+   T = (bme280_data.t_fine * 5 + 128) >> 8;
    return T;
 }
 
@@ -153,12 +153,12 @@ int BME280_compensate_T_int32(int adc_T) {
 unsigned int BME280_compensate_P_int64(int adc_P) {
    long long int var1, var2, p;
 
-   var1 = ((long long int)bme280_config.t_fine) - 128000;
-   var2 = var1 * var1 * (long long int)bme280_config.dig_P6;
-   var2 = var2 + ((var1 * (long long int)bme280_config.dig_P5) << 17);
-   var2 = var2 + (((long long int)bme280_config.dig_P4) << 35);
-   var1 = ((var1 * var1 * (long long int)bme280_config.dig_P3) >> 8) + ((var1 * (long long int)bme280_config.dig_P2) << 12);
-   var1 = (((((long long int)1) << 47) + var1)) * ((long long int)bme280_config.dig_P1) >> 33;
+   var1 = ((long long int)bme280_data.t_fine) - 128000;
+   var2 = var1 * var1 * (long long int)bme280_data.dig_P6;
+   var2 = var2 + ((var1 * (long long int)bme280_data.dig_P5) << 17);
+   var2 = var2 + (((long long int)bme280_data.dig_P4) << 35);
+   var1 = ((var1 * var1 * (long long int)bme280_data.dig_P3) >> 8) + ((var1 * (long long int)bme280_data.dig_P2) << 12);
+   var1 = (((((long long int)1) << 47) + var1)) * ((long long int)bme280_data.dig_P1) >> 33;
 
    if(var1 == 0) {
       return 0;                 // avoid exception caused by division by zero
@@ -166,9 +166,9 @@ unsigned int BME280_compensate_P_int64(int adc_P) {
 
    p = 1048576 - adc_P;
    p = (((p << 31) - var2) * 3125) / var1;
-   var1 = (((long long int)bme280_config.dig_P9) * (p >> 13) * (p >> 13)) >> 25;
-   var2 = (((long long int)bme280_config.dig_P8) * p) >> 19;
-   p = ((p + var1 + var2) >> 8) + (((long long int)bme280_config.dig_P7) << 4);
+   var1 = (((long long int)bme280_data.dig_P9) * (p >> 13) * (p >> 13)) >> 25;
+   var2 = (((long long int)bme280_data.dig_P8) * p) >> 19;
+   p = ((p + var1 + var2) >> 8) + (((long long int)bme280_data.dig_P7) << 4);
    return (unsigned int)p;
 }
 
@@ -177,11 +177,11 @@ unsigned int BME280_compensate_P_int64(int adc_P) {
 unsigned int BME280_compensate_H_int32(int adc_H) {
    int v_x1_u32r;
 
-   v_x1_u32r = (bme280_config.t_fine - ((int)76800));
+   v_x1_u32r = (bme280_data.t_fine - ((int)76800));
    v_x1_u32r =
-      (((((adc_H << 14) - (((int)bme280_config.dig_H4) << 20) - (((int)bme280_config.dig_H5) * v_x1_u32r)) + ((int)16384)) >> 15) * (((((((v_x1_u32r * ((int)bme280_config.dig_H6)) >> 10) * (((v_x1_u32r * ((int)bme280_config.dig_H3)) >> 11) + ((int)32768))) >> 10) +
-               ((int)2097152)) * ((int)bme280_config.dig_H2) + 8192) >> 14));
-   v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * ((int)bme280_config.dig_H1)) >> 4));
+      (((((adc_H << 14) - (((int)bme280_data.dig_H4) << 20) - (((int)bme280_data.dig_H5) * v_x1_u32r)) + ((int)16384)) >> 15) * (((((((v_x1_u32r * ((int)bme280_data.dig_H6)) >> 10) * (((v_x1_u32r * ((int)bme280_data.dig_H3)) >> 11) + ((int)32768))) >> 10) +
+               ((int)2097152)) * ((int)bme280_data.dig_H2) + 8192) >> 14));
+   v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * ((int)bme280_data.dig_H1)) >> 4));
    v_x1_u32r = (v_x1_u32r < 0 ? 0 : v_x1_u32r);
    v_x1_u32r = (v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r);
    return (unsigned int)(v_x1_u32r >> 12);

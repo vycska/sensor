@@ -2,9 +2,9 @@
 #include "adc.h"
 #include "fifos.h"
 #include "os.h"
+#include "switch.h"
 #include "task_bme280.h"
 #include "task_ds18b20.h"
-#include "task_switch.h"
 #include "mrt.h"
 #include "u8g2.h"
 #include "utils-asm.h"
@@ -15,7 +15,8 @@ uint8_t u8x8_gpio_and_delay(u8x8_t*,uint8_t,uint8_t,void*);
 
 extern volatile long long int millis;
 extern struct tcb *RunPt;
-extern struct ADC_Data adc_data;
+extern volatile struct ADC_Data adc_data;
+extern volatile struct Switch_Data switch_data;
 extern struct Task_BME280_Data task_bme280_data;
 extern struct Task_DS18B20_Data task_ds18b20_data;
 
@@ -34,24 +35,13 @@ void Task_Oled(void) {
    u8g2_SetPowerSave(&u8g2,0); //wake up display
    EnableInterrupts();
 
-   u8g2_ClearBuffer(&u8g2);
-
-   u8g2_DrawLine(&u8g2,0,0,127,0);
-   u8g2_DrawLine(&u8g2,0,63,127,63);
-   u8g2_DrawLine(&u8g2,0,0,0,63);
-   u8g2_DrawLine(&u8g2,127,0,127,63);
-   u8g2_DrawCircle(&u8g2,64,32,31,U8G2_DRAW_ALL);
-   u8g2_SendBuffer(&u8g2);
-
-   OS_Sleep(2000);
-
    while(1) {
       u8g2_ClearBuffer(&u8g2);
 
       switch(task_oled_data.screen) {
          case 0:
             mysprintf(buf,"ds18b20: temper., %s","\xb0""C");
-            if(task_ds18b20_data.temperature!=DS18B20_ERROR_TEMPERATURE) {
+            if(task_ds18b20_data.temperature!=DS18B20_ERROR_VALUE) {
                v=task_ds18b20_data.temperature/100.0;
                mysprintf(buf2,"%f1",(char*)&v);
             }
@@ -60,18 +50,30 @@ void Task_Oled(void) {
             break;
          case 1:
             mysprintf(buf,"bme280: temper., %s","\xb0""C");
-            v = task_bme280_data.t/100.0;
-            mysprintf(buf2,"%f1",(char*)&v);
+            if(task_bme280_data.t != BME280_ERROR_VALUE) {
+               v = task_bme280_data.t/100.0;
+               mysprintf(buf2,"%f1",(char*)&v);
+            }
+            else
+               mysprintf(buf2,"**.*");
             break;
          case 2:
             mysprintf(buf,"bme280: dregme, %%");
-            v = task_bme280_data.h/100.0;
-            mysprintf(buf2,"%f1",(char*)&v);
+            if(task_bme280_data.h != BME280_ERROR_VALUE) {
+               v = task_bme280_data.h/100.0;
+               mysprintf(buf2,"%f1",(char*)&v);
+            }
+            else
+               mysprintf(buf2,"**.*");
             break;
          case 3:
             mysprintf(buf,"bme280: slegis, mmHg");
-            v = task_bme280_data.p/100.0;
-            mysprintf(buf2,"%f1",(char*)&v);
+            if(task_bme280_data.p != BME280_ERROR_VALUE) {
+               v = task_bme280_data.p/100.0;
+               mysprintf(buf2,"%f1",(char*)&v);
+            }
+            else
+               mysprintf(buf2,"**.*");
             break;
          case 4: //adc
             mysprintf(buf,"Li-Ion baterija, V");
@@ -79,6 +81,18 @@ void Task_Oled(void) {
             mysprintf(buf2,"%f2",(char*)&v);
             break;
       }
+      if(switch_data.active)
+         switch((millis-switch_data.start)/4000) {
+            case 1:
+               mysprintf(buf,"LED");
+               break;
+            case 2:
+               mysprintf(buf,"config");
+               break;
+            case 3:
+               mysprintf(buf,"UART");
+               break;
+         }
       u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
       u8g2_DrawStr(&u8g2,0,8,buf);
       u8g2_SetFont(&u8g2,u8g2_font_fur35_tn);

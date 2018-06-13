@@ -3,7 +3,7 @@
 #include "utils.h"
 #include "lpc824.h"
 
-struct ADC_Data adc_data;
+volatile struct ADC_Data adc_data;
 
 void ADC_Init(void) {
    ADCSEQA_CTRL &= (~(1u<<31)); //disable sequence A
