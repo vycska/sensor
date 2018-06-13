@@ -40,10 +40,19 @@ void MRT_IRQHandler(void) {
          }
       }
       //process switch
-      if(switch_data.active && !Switch_Pressed()) {
-         switch_data.active = 0;
-         switch_data.duration = millis-switch_data.start;
-         OS_Blocking_Signal(&smphr_switch);
+      if(switch_data.active) {
+         if(Switch_Pressed()) {
+            switch_data.delay = 0;
+         }
+         else {
+            switch_data.delay += 1;
+            if(switch_data.delay==1000) {
+               switch_data.active = 0;
+               switch_data.delay = 0;
+               switch_data.duration = millis-switch_data.start-1000;
+               OS_Blocking_Signal(&smphr_switch);
+            }
+         }
       }
    }
    if(STAT1&(1<<0)) { //TIMER1

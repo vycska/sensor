@@ -30,11 +30,9 @@ void Task_Switch(void) {
             task_oled_data.screen = (task_oled_data.screen+1)%task_oled_data.total_screens;
             break;
          case 0:
-            if(switch_data.duration>=1000) {
-               mysprintf(buf,"switch %d",switch_data.duration);
-               Fifo_Command_Parser_Put(buf);
-            }
-            OS_Sleep(100);
+            mysprintf(buf,"switch %d",switch_data.duration);
+            Fifo_Command_Parser_Put(buf);
+            RISE = (1<<0);
             SIENR = (1<<0); //enable rising edge interrupt for pin selected in PINTSEL0; this is indirect register which operates on IENR register
             break;
       }

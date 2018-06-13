@@ -18,7 +18,6 @@ extern struct tcb *RunPt;
 extern struct ADC_Data adc_data;
 extern struct Task_BME280_Data task_bme280_data;
 extern struct Task_DS18B20_Data task_ds18b20_data;
-extern struct Task_Switch_Data task_switch_data;
 
 struct Task_Oled_Data task_oled_data = {0,5};
 u8g2_t u8g2; //a structure which contains all the data for one display

@@ -2,13 +2,13 @@
 #define __SWITCH_H__
 
 struct Dump {
-   volatile int index;
-   volatile long long int millis[100];
+   int index;
+   long long int millis[20];
 };
 
 struct Switch_Data {
-   int active,duration;
-   long long int start;
+   volatile int active,delay,duration;
+   volatile long long int start;
 };
 
 void Switch_Init(void);

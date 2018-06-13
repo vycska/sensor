@@ -1,11 +1,12 @@
 #include "switch.h"
 #include "os.h"
+#include "utils-asm.h"
 #include "lpc824.h"
 
 extern int smphr_switch;
 extern volatile long long int millis;
 
-struct Dump dump;
+volatile struct Dump dump;
 volatile struct Switch_Data switch_data;
 
 void Switch_Init(void) {
@@ -26,17 +27,17 @@ int Switch_Pressed(void) {
 }
 
 void PININT0_IRQHandler(void) {
-   RISE = (1<<0);
-   if(millis-switch_data.start >= 500) {
-      switch_data.active = 1;
-      switch_data.start = millis;
-      CIENR = (1<<0); //disable rising edge interrupt for pin selected in PINTSEL0
-      OS_Blocking_Signal(&smphr_switch);
-      OS_Suspend();
-
-   }
-   if(dump.index<100) {
+   if(dump.index<20) {
       dump.millis[dump.index] = millis;
       dump.index += 1;
+   }
+   RISE = (1<<0);
+   if(switch_data.active==0) {
+      CIENR = (1<<0); //disable rising edge interrupt for pin selected in PINTSEL0
+      switch_data.active = 1;
+      switch_data.delay = 0;
+      switch_data.start = millis;
+      OS_Blocking_Signal(&smphr_switch);
+      OS_Suspend();
    }
 }
