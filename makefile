@@ -1,4 +1,4 @@
-# make all libs clean cleanall install picocom tags print-<variable>
+# make all libs clean cleanall install picocom tags board_images print-<variable>
 
 ################################################################################
 
@@ -59,7 +59,7 @@ deps/%.d : ;
 
 ################################################################################
 
-.PHONY : all libs clean cleanall install picocom tags print-%
+.PHONY : all libs clean cleanall install picocom tags board_images print-%
 
 all : $(TARGET).elf
 
@@ -69,7 +69,7 @@ libs/libu8g2.a : $(U8G2OBJS)
 	arm-none-eabi-ar -rcsDv --target=elf32-littlearm $@ $^
 
 clean :
-	rm -rf *.o *.elf *.bin *.hex *.map *.lst cscope* tags deps objs
+	rm -rf *.o *.elf *.bin *.hex *.map *.lst *.png cscope* tags deps objs
 
 cleanall : clean
 	rm -rf libs
@@ -84,6 +84,14 @@ tags :
 	ctags -R --extra=+f *
 	find . -name '*.[csh]' > cscope.files
 	cscope -q -R -b -i cscope.files
+
+board_images : board_front.png board_back.png
+
+board_front.png : board_front.r
+	R -f board_front.r
+
+board_back.png : board_back.r
+	R -f board_back.r
 
 print-% :
 	@echo $* = $($*)
