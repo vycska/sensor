@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct UART_Data uart_data;
+volatile struct UART_Data uart_data;
 
 //baudrate: 9600, main_clock: 60000000, uartdiv: 250, divided_clock: 240000, mult: 144, u_pclk: 153600, brgval: 1
 //baudrate: 38400, main_clock: 60000000, uartdiv: 5, divided_clock: 12000000, mult: 244, u_pclk: 6144000, brgcal: 10
@@ -25,7 +25,10 @@ void UART0_Init(void) {
    USART0CTL = (0<<1 | 0<<2 | 0<<6 | 0<<16); //no break, no address detect mode, transmit not disabled, autobaud disabled
    USART0INTENSET = (1<<0); //interrupt when there is a received character
    IPR0 = (IPR0&(~(3u<<30))) | (2u<<30); //UART0 interrupt priority 2 (0 = highest, 3 = lowest)
-   ICER0 = (1<<3); //UART0 interrupt disable
+   if(uart_data.uart_in_enabled)
+      ISER0 = (1<<3); //UART0 interrupt enable
+   else
+      ICER0 = (1<<3); //UART0 interrupt disable
    USART0CFG = (1<<0 | 1<<2 | 0<<4 | 0<<6 | 0<<9 | 0<<11 | 0<<15); //USART0 enable, 8b data length, no parity, 1 stop bit, no flow control, asynchronous mode, no loopback mode
 }
 
@@ -49,7 +52,7 @@ void UART0_IRQHandler(void) {
       else if(uart_data.i != 0) {
          //send received command to the FIFO buffer
          uart_data.s[uart_data.i] = 0;
-         Fifo_Command_Parser_Put(uart_data.s);
+         Fifo_Command_Parser_Put((char*)uart_data.s);
          uart_data.i = 0;
       }
    }

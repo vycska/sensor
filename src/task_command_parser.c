@@ -6,9 +6,11 @@
 #include "led.h"
 #include "onewire.h"
 #include "os.h"
+#include "output.h"
 #include "switch.h"
 #include "task_oled.h"
 #include "task_switch.h"
+#include "uart.h"
 #include "utils.h"
 #include "utils-asm.h"
 #include "lpc824.h"
@@ -24,21 +26,22 @@ int params_integer(char,unsigned int*);
 extern volatile long long int millis;
 extern struct BME280_Data bme280_data;
 extern struct LED_Data led_data;
+extern struct Output_Data output_data;
 extern struct Task_Oled_Data task_oled_data;
+extern volatile struct UART_Data uart_data;
 extern struct tcb *RunPt,tcbs[NUMTHREADS];
 
 void Task_Command_Parser(void) {
    char *pString, buf[128];
-   int i, l, smphrFinished;
+   int i, l;
    unsigned int t, params[8];
 
-   Fifo_Uart0_Put("Task_Command_Parser has started", 0);
-   OS_InitSemaphore(&smphrFinished, 0);
+   output("Task_Command_Parser has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+
    while(1) {
       Fifo_Command_Parser_Get(&pString);
       mysprintf(buf, "<< %s >>", pString);
-      Fifo_Uart0_Put(buf, &smphrFinished);
-      OS_Blocking_Wait(&smphrFinished);
+      output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
       memset(params, 0, sizeof(params));
       params_fill(pString, params);
@@ -49,20 +52,17 @@ void Task_Command_Parser(void) {
             break;
          case 0x57e6: //millis
             mysprintf(buf, "%l", (char *)&millis);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
             break;
          case 0xd89c: //live_time
             mysprintf(buf, "%d,%d:%d:%d", (int)(millis / 1000 / 60 / 60 / 24), (int)(millis / 1000 / 60 / 60 % 24), (int)(millis / 1000 / 60 % 60), (int)(millis / 1000 % 60));
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
             break;
          case 0xca53: //task_info
             for(i = 0; i < NUMTHREADS; i++) {
                mysprintf(buf, "%d %s %n pr: %d %n sp: %x sl: %d %n bl: %x",
                (int)tcbs[i].id, tcbs[i].name, 20-strlen(tcbs[i].name), (int)tcbs[i].priority, 4-ndigits(tcbs[i].priority), tcbs[i].sp, tcbs[i].sleep, 7-ndigits(tcbs[i].sleep), tcbs[i].block);
-               Fifo_Uart0_Put(buf, &smphrFinished);
-               OS_Blocking_Wait(&smphrFinished);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
             }
             break;
          case 0x426e: //config_save
@@ -73,8 +73,37 @@ void Task_Command_Parser(void) {
                for(t=0, l=1,i=strlen((char*)params[2])-1; i>=2; l*= 16, i--)
                   t += l * (((char*)params[2])[i]>='0' && ((char*)params[2])[i]<='9' ? (((char*)params[2])[i]-'0') : (((char*)params[2])[i]>='a' && ((char*)params[2])[i]<='f' ? (10+((char*)params[2])[i]-'a') : (0)));
                mysprintf(buf,"0x%x : 0x%x",t,*((unsigned int*)t));
-               Fifo_Uart0_Put(buf, &smphrFinished);
-               OS_Blocking_Wait(&smphrFinished);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+            }
+            break;
+         case 0x3f19: //output_mask
+            if(params_count(params)==3 && params[2]<eOutputSubsystemLast)
+               output_data.mask[params[2]] = params[3];
+            else {
+               mysprintf(buf,"ADC %d",(int)eOutputSubsystemADC);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               mysprintf(buf,"BME280 %d",(int)eOutputSubsystemBME280);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               mysprintf(buf,"DS18B20 %d",(int)eOutputSubsystemDS18B20);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               mysprintf(buf,"Oled %d",(int)eOutputSubsystemOled);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               mysprintf(buf,"System %d",(int)eOutputSubsystemSystem);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               mysprintf(buf,"Switch %d",(int)eOutputSubsystemSwitch);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               mysprintf(buf,"None %d",(int)eOutputLevelNone);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               mysprintf(buf,"Debug %d",(int)eOutputLevelDebug);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               mysprintf(buf,"Normal %d",(int)eOutputLevelNormal);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               mysprintf(buf,"Important %d",(int)eOutputLevelImportant);
+               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               for(i=0; i<(int)eOutputSubsystemLast; i++) {
+                  mysprintf(buf, "[%d] %u",i,(unsigned int)output_data.mask[i]);
+                  output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               }
             }
             break;
          case 0xcb6e: //screen
@@ -87,121 +116,92 @@ void Task_Command_Parser(void) {
             break;
          case 0xa577: //bme280_config
             mysprintf(buf, "dig_T1: %d", (int)bme280_data.dig_T1);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_T2: %d", (int)bme280_data.dig_T2);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_T3: %d", (int)bme280_data.dig_T3);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_P1: %d", (int)bme280_data.dig_P1);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_P2: %d", (int)bme280_data.dig_P2);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_P3: %d", (int)bme280_data.dig_P3);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_P4: %d", (int)bme280_data.dig_P4);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_P5: %d", (int)bme280_data.dig_P5);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_P6: %d", (int)bme280_data.dig_P6);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_P7: %d", (int)bme280_data.dig_P7);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_P8: %d", (int)bme280_data.dig_P8);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_P9: %d", (int)bme280_data.dig_P9);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_H1: %d", (int)bme280_data.dig_H1);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_H2: %d", (int)bme280_data.dig_H2);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_H3: %d", (int)bme280_data.dig_H3);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_H4: %d", (int)bme280_data.dig_H4);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_H5: %d", (int)bme280_data.dig_H5);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "dig_H6: %d", (int)bme280_data.dig_H6);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "t_fine: %d", (int)bme280_data.t_fine);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "os_h: %d", (int)bme280_data.os_h);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "os_p: %d", (int)bme280_data.os_p);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "os_t: %d", (int)bme280_data.os_t);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "adc_H: %d", (int)bme280_data.adc_H);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "adc_P: %d", (int)bme280_data.adc_P);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "adc_T: %d", (int)bme280_data.adc_T);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "H: %d", (int)bme280_data.H);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "P: %d", (int)bme280_data.P);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
 
             mysprintf(buf, "T: %d", (int)bme280_data.T);
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
             break;
          case 0xed5: //psr
             mysprintf(buf, "0x%x", GetPSR());
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
             break;
          case 0x7f7e: //iap_info
             t = iap_read_part_id();
@@ -210,15 +210,17 @@ void Task_Command_Parser(void) {
             l += mysprintf(&buf[l], "Boot code version: %d.%d\r\n", (t >> 8) & 0xff, t & 0xff);
             t = (unsigned int)iap_read_uid();
             l += mysprintf(&buf[l], "UID: %u %u %u %u", *((unsigned int *)t + 0), *((unsigned int *)t + 1), *((unsigned int *)t + 2), *((unsigned int *)t + 3));
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
             break;
          case 0x3fab: //uart_in_enabled
-            if((IABR0>>3)&1)
+            if(uart_data.uart_in_enabled) {
                ICER0 = (1<<3);
+               uart_data.uart_in_enabled = 0;
+            }
             else {
                ICPR0 = (1<<3);
                ISER0 = (1<<3);
+               uart_data.uart_in_enabled = 1;
             }
             break;
          case 0xfb7e: //led_enabled
@@ -238,13 +240,12 @@ void Task_Command_Parser(void) {
             break;
          case 0xe89e: //crc16
             mysprintf(buf, "0x%x", (unsigned int)crc16((unsigned char *)params[2], strlen((char *)params[2])));
-            Fifo_Uart0_Put(buf, &smphrFinished);
-            OS_Blocking_Wait(&smphrFinished);
+            output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
             break;
          case 0xbf26: //temp
             break;
          default:
-            Fifo_Uart0_Put("Unknown command", 0);
+            output("Unknown command", eOutputSubsystemSystem, eOutputLevelImportant, 0);
       }
    }
 }

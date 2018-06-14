@@ -2,6 +2,7 @@
 #include "fifos.h"
 #include "main.h"
 #include "os.h"
+#include "output.h"
 #include "switch.h"
 #include "task_oled.h"
 #include "utils.h"
@@ -16,7 +17,7 @@ int smphr_switch;
 void Task_Switch(void) {
    char buf[32];
 
-   Fifo_Uart0_Put("Task_Switch has started", 0);
+   output("Task_Switch has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
 
    Switch_Init();
 
@@ -30,8 +31,7 @@ void Task_Switch(void) {
             break;
          case 0:
             mysprintf(buf,"switch %d",switch_data.duration);
-            //output(buf,eOutputSwitch,1);
-            Fifo_Command_Parser_Put(buf);
+            output(buf, eOutputSubsystemSwitch, eOutputLevelDebug, 1);
             switch(switch_data.duration/4000) {
                case 1:
                   Fifo_Command_Parser_Put("led_enabled");

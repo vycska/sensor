@@ -8,7 +8,7 @@ void UART0_Transmit(char *, int);
 
 struct UART_Data {
    char s[UART_IN_MAX];
-   int i;
+   int i,uart_in_enabled;
 };
 
 #endif
