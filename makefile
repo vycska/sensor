@@ -88,10 +88,10 @@ tags :
 board_images : board_front.png board_back.png
 
 board_front.png : board_front.r
-	R -f board_front.r
+	R --vanilla -q -f board_front.r
 
 board_back.png : board_back.r
-	R -f board_back.r
+	R --vanilla -q -f board_back.r
 
 print-% :
 	@echo $* = $($*)
