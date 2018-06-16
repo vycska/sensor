@@ -32,8 +32,8 @@ void UART0_Init(void) {
    USART0CFG = (1<<0 | 1<<2 | 0<<4 | 0<<6 | 0<<9 | 0<<11 | 0<<15); //USART0 enable, 8b data length, no parity, 1 stop bit, no flow control, asynchronous mode, no loopback mode
 }
 
-void UART0_Transmit(char *s, int k) {
-   int i;
+void UART0_Transmit(char *s) {
+   int i,k=strlen(s);
    for(i=0;i<k+2;i++) { //+2 nes gale pridesim \r\n
       while((USART0STAT&(1<<2))==0); //wait until TXRDY
       USART0TXDAT = (i == k ? '\r' : (i == k + 1 ? '\n' : s[i]));

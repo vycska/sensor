@@ -4,7 +4,7 @@
 #define UART_IN_MAX 48
 
 void UART0_Init(void);
-void UART0_Transmit(char *, int);
+void UART0_Transmit(char*);
 
 struct UART_Data {
    char s[UART_IN_MAX];

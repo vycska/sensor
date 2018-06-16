@@ -18,15 +18,18 @@
 #include "task_switch.h"
 #include "task_uart0_output.h"
 #include "uart.h"
+#include "utils.h"
 #include "utils-asm.h"
 #include "lpc824.h"
 
 extern char _data_start_lma, _data_start, _data_end, _bss_start, _bss_end;
+extern char _intvecs_size, _text_size, _rodata_size, _data_size, _bss_size, _stack_size, _heap_size;
 
 int mtx_i2c0,mtx_mrt1;
 volatile long long int millis;
 
 void main(void) {
+   char buf[32];
    int t; 
 
    t = config_load();
@@ -48,16 +51,43 @@ void main(void) {
    OS_InitSemaphore(&mtx_i2c0,1);
    OS_InitSemaphore(&mtx_mrt1,1);
 
-   output(t?"config_load error":"config_load ok", eOutputSubsystemSystem, eOutputLevelImportant, 0);
+   mysprintf(buf,"VERSION: %d",VERSION);
+   output(buf,eOutputSubsystemSystem, eOutputLevelImportant, -1);
+
+   output(__DATE__,eOutputSubsystemSystem, eOutputLevelImportant, -1);
+   output(__TIME__,eOutputSubsystemSystem, eOutputLevelImportant, -1);
+
+   output(t?"config_load error":"config_load ok", eOutputSubsystemSystem, eOutputLevelImportant, -1);
+
+   mysprintf(buf, "_intvecs_size: %u", (unsigned int)&_intvecs_size);
+   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
+
+   mysprintf(buf, "_text_size: %u", (unsigned int)&_text_size);
+   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
+
+   mysprintf(buf, "_rodata_size: %u", (unsigned int)&_rodata_size);
+   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
+
+   mysprintf(buf, "_data_size: %u", (unsigned int)&_data_size);
+   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
+
+   mysprintf(buf, "_bss_size: %u", (unsigned int)&_bss_size);
+   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
+
+   mysprintf(buf, "_stack_size: %u", (unsigned int)&_stack_size);
+   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
+
+   mysprintf(buf, "_heap_size: %u", (unsigned int)&_heap_size);
+   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
 
    OS_Init(NUMTHREADS,
-         "switch",3,Task_Switch,
-         "command_parser",4,Task_Command_Parser,
-         "bme280",6,Task_BME280,
-         "ds18b20",6,Task_DS18B20,
-         "oled",7,Task_Oled,
-         "uart0_output",8,Task_Uart0_Output,
-         "idle",31,Task_Idle);
+         "switch",            3,    Task_Switch,
+         "command_parser",    4,    Task_Command_Parser,
+         "bme280",            6,    Task_BME280,
+         "ds18b20",           6,    Task_DS18B20,
+         "oled",              7,    Task_Oled,
+         "uart0_output",      8,    Task_Uart0_Output,
+         "idle",              31,   Task_Idle);
    OS_Start();
 }
 

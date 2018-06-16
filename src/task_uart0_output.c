@@ -13,7 +13,7 @@ void Task_Uart0_Output(void) {
 
    while(1) {
       Fifo_Uart0_Get(&pString, &smphrFinished);
-      UART0_Transmit(pString, strlen(pString));
+      UART0_Transmit(pString);
       if(smphrFinished)
          OS_Blocking_Signal(smphrFinished);
    }
