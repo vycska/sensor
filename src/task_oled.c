@@ -5,6 +5,7 @@
 #include "switch.h"
 #include "task_bme280.h"
 #include "task_ds18b20.h"
+#include "main.h"
 #include "mrt.h"
 #include "output.h"
 #include "u8g2.h"
@@ -77,8 +78,13 @@ void Task_Oled(void) {
                mysprintf(buf2,"**.*");
             break;
          case 4: //adc
+#if BOARD == BOARD_TEST
+            mysprintf(buf, "2xAA baterijos, V");
+            v = ((double)adc_data.sum/adc_data.count)/4095.0*3.3;
+#elif BOARD == BOARD_RELEASE
             mysprintf(buf,"Li-Ion baterija, V");
             v = ((double)adc_data.sum/adc_data.count)/4095.0*3.3 * 2;
+#endif
             mysprintf(buf2,"%f2",(char*)&v);
             break;
       }
@@ -108,6 +114,17 @@ void Task_Oled(void) {
 uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8,uint8_t msg,uint8_t arg_int,void *arg_ptr) {
    switch(msg) {
       case U8X8_MSG_GPIO_AND_DELAY_INIT: //called once during init phase of u8g2; can be used to setup pins
+#if BOARD == BOARD_TEST
+         PINENABLE0 |= (1<<1 | 1<<9); //ACMP_12 and CLKIN disabled on pin PIO0_1
+         //SDA
+         PIO0_1 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11); //no pd/pu, hysteresis disable, input not inverted, open drain mode, bypass input filter
+         //SCL
+         PIO0_15 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11); //no pd/pu, hysteresis disable, input not inverted, open drain mode, bypass input filter
+         //direction is output
+         DIR0 |= (1<<1 | 1<<15);
+         //initially released
+         SET0 = (1<<1 | 1<<15);
+#elif BOARD == BOARD_RELEASE
          PINENABLE0 |= (1<<22 | 1<<23); //ADC_9 disabled on PIO0_17, ADC_10 disabled on PIO0_13
          //SDA is PIO0_17
          PIO0_17 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11 | 0<<13); //no pd/pu, hysteresis disable, input not inverted, open drain mode, bypass input filter, IOCONCLKDIV0
@@ -117,6 +134,7 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8,uint8_t msg,uint8_t arg_int,void *arg_p
          DIR0 |= (1<<13 | 1<<17);
          //initially released
          SET0 = (1<<13 | 1<<17);
+#endif
          break;
       case U8X8_MSG_DELAY_100NANO: //delay arg_int*100 nano seconds
          MRT1_Delay(arg_int*100);
@@ -131,12 +149,26 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8,uint8_t msg,uint8_t arg_int,void *arg_p
          MRT1_Delay(5.0/arg_int*1000);
          break;
       case U8X8_MSG_GPIO_I2C_CLOCK: //arg_int=0: output low at I2C clock pin; arg_int=1: input dir with pullup high for I2C clock pin
+#if BOARD == BOARD_TEST
+         if(arg_int == 0)
+            CLR0 = (1<<15);
+         else
+            SET0 = (1<<15);
+#elif BOARD == BOARD_RELEASE
          if(arg_int==0) CLR0 = (1<<13);
          else SET0 = (1<<13);
+#endif
          break;
       case U8X8_MSG_GPIO_I2C_DATA: //arg_int=0: output low at I2C data pin; arg_int=1: input dir with pullup high for I2C data pin
+#if BOARD == BOARD_TEST
+         if(arg_int == 0)
+            CLR0 = (1<<1);
+         else
+            SET0 = (1<<1);
+#elif BOARD == BOARD_RELEASE
          if(arg_int==0) CLR0 = (1<<17);
          else SET0 = (1<<17);
+#endif
          break;
       default:
          u8x8_SetGPIOResult(u8x8,1); //default return value

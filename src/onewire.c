@@ -1,26 +1,47 @@
 #include "onewire.h"
+#include "main.h"
 #include "mrt.h"
 #include "utils.h"
 #include "lpc824.h"
 
 void onewire_init(void) {
+#if BOARD == BOARD_TEST
+   //pin for 1-wire P0.13
+   PINENABLE0 |= (1<<23); //ADC_10 disabled on pin PIO0_13
+   PIO0_13 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11); //no pd/pu, disable hysteresis, input not inverted, open drain mode, bypass input filter
+   DIR0 |= (1<<13); //output direction
+   SET0 = (1<<13); //at start line is released
+#elif BOARD == BOARD_RELEASE
    //pin for 1-wire P0.9
    PINENABLE0 |= (1<<7); //XTALOUT disabled on PIO0_9
    PIO0_9 = (0<<3 | 0<<5 | 0<<6 | 1<<10 | 0<<11 | 0<<13); //no pd/pu, disable hysteresis, input not inverted, open drain mode, bypass input filter, IOCONCLKDIV0
    DIR0 |= (1<<9); //output direction
    SET0 = (1<<9); //at start line is released
+#endif
 }
 
 void onewire_drivelinelow(void) {
+#if BOARD == BOARD_TEST
+   CLR0 = (1<<13);
+#elif BOARD == BOARD_RELEASE
    CLR0 = (1<<9);
+#endif
 }
 
 void onewire_releaseline(void) {
+#if BOARD == BOARD_TEST
+   SET0 = (1<<13);
+#elif BOARD == BOARD_RELEASE
    SET0 = (1<<9);
+#endif
 }
 
 unsigned char onewire_getlinevalue(void) {
+#if BOARD == BOARD_TEST
+   return (PIN0>>13)&1;
+#elif BOARD == BOARD_RELEASE
    return (PIN0>>9)&1;
+#endif
 }
 
 void onewire_delay(int us) {
