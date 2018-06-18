@@ -17,7 +17,7 @@ int smphr_switch;
 void Task_Switch(void) {
    char buf[32];
 
-   output("Task_Switch has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   //output("Task_Switch has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
 
    Switch_Init();
 

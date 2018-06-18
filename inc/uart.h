@@ -1,10 +1,10 @@
 #ifndef __UART_H__
 #define __UART_H__
 
-#define UART_IN_MAX 48
+#define UART_IN_MAX 64
 
-void UART0_Init(void);
-void UART0_Transmit(char*);
+void UART_Init(void);
+void UART_Transmit(char*);
 
 struct UART_Data {
    char s[UART_IN_MAX];

@@ -9,6 +9,11 @@ MEMORY
    ram(rw)   : ORIGIN = 0x10000000, LENGTH = 8K
 }
 
+_flash_start = ORIGIN(flash);
+_flash_end = ORIGIN(flash) + LENGTH(flash);
+_ram_start = ORIGIN(ram);
+_ram_end = ORIGIN(ram) + LENGTH(ram);
+
 SECTIONS
 {
    .intvecs : {

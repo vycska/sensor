@@ -15,7 +15,7 @@ void Task_BME280(void) {
    unsigned char id[1];
    double h, p, t;
 
-   output("Task_BME280 has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   //output("Task_BME280 has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
 
    OS_Sleep(2); //max time for first communication
 

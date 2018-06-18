@@ -3,7 +3,7 @@
 #include <string.h>
 
 struct Fifo_Command_Parser fifo_command_parser;
-struct Fifo_Uart0_Output fifo_uart0_output;
+struct Fifo_Uart_Output fifo_uart_output;
 
 void Fifo_Command_Parser_Init(void) {
    fifo_command_parser.i_get = fifo_command_parser.i_put = 0;
@@ -33,33 +33,33 @@ void Fifo_Command_Parser_Put(char *pString) {
 
 /* ********** */
 
-void Fifo_Uart0_Init(void) {
-   fifo_uart0_output.i_get = fifo_uart0_output.i_put = 0;
-   OS_InitSemaphore(&fifo_uart0_output.mtx_fifo_uart0_output, 1);
-   OS_InitSemaphore(&fifo_uart0_output.smphr_count_items, 0);
-   OS_InitSemaphore(&fifo_uart0_output.smphr_space_left, FIFO_UART0_OUTPUT_ITEMS);
+void Fifo_Uart_Output_Init(void) {
+   fifo_uart_output.i_get = fifo_uart_output.i_put = 0;
+   OS_InitSemaphore(&fifo_uart_output.mtx_fifo_uart_output, 1);
+   OS_InitSemaphore(&fifo_uart_output.smphr_count_items, 0);
+   OS_InitSemaphore(&fifo_uart_output.smphr_space_left, FIFO_UART_OUTPUT_ITEMS);
 }
 
-void Fifo_Uart0_Get(char **pString, int **smphrFinished) {
-   OS_Blocking_Wait(&fifo_uart0_output.smphr_count_items);
-   OS_Blocking_Wait(&fifo_uart0_output.mtx_fifo_uart0_output);
+void Fifo_Uart_Output_Get(char **pString, int **smphrFinished) {
+   OS_Blocking_Wait(&fifo_uart_output.smphr_count_items);
+   OS_Blocking_Wait(&fifo_uart_output.mtx_fifo_uart_output);
 
-   *pString = fifo_uart0_output.buffer[fifo_uart0_output.i_get];
-   *smphrFinished = fifo_uart0_output.smphr_finished[fifo_uart0_output.i_get];
-   fifo_uart0_output.i_get = (fifo_uart0_output.i_get + 1) % FIFO_UART0_OUTPUT_ITEMS;
+   *pString = fifo_uart_output.buffer[fifo_uart_output.i_get];
+   *smphrFinished = fifo_uart_output.smphr_finished[fifo_uart_output.i_get];
+   fifo_uart_output.i_get = (fifo_uart_output.i_get + 1) & (FIFO_UART_OUTPUT_ITEMS-1);
 
-   OS_Blocking_Signal(&fifo_uart0_output.mtx_fifo_uart0_output);
-   OS_Blocking_Signal(&fifo_uart0_output.smphr_space_left);
+   OS_Blocking_Signal(&fifo_uart_output.mtx_fifo_uart_output);
+   OS_Blocking_Signal(&fifo_uart_output.smphr_space_left);
 }
 
-void Fifo_Uart0_Put(char *pString, int *smphrFinished) {
-   OS_Blocking_Wait(&fifo_uart0_output.smphr_space_left);
-   OS_Blocking_Wait(&fifo_uart0_output.mtx_fifo_uart0_output);
+void Fifo_Uart_Output_Put(char *pString, int *smphrFinished) {
+   OS_Blocking_Wait(&fifo_uart_output.smphr_space_left);
+   OS_Blocking_Wait(&fifo_uart_output.mtx_fifo_uart_output);
 
-   fifo_uart0_output.buffer[fifo_uart0_output.i_put] = pString;
-   fifo_uart0_output.smphr_finished[fifo_uart0_output.i_put] = smphrFinished;
-   fifo_uart0_output.i_put = (fifo_uart0_output.i_put + 1) % FIFO_UART0_OUTPUT_ITEMS;
+   fifo_uart_output.buffer[fifo_uart_output.i_put] = pString;
+   fifo_uart_output.smphr_finished[fifo_uart_output.i_put] = smphrFinished;
+   fifo_uart_output.i_put = (fifo_uart_output.i_put + 1) & (FIFO_UART_OUTPUT_ITEMS-1);
 
-   OS_Blocking_Signal(&fifo_uart0_output.mtx_fifo_uart0_output);
-   OS_Blocking_Signal(&fifo_uart0_output.smphr_count_items);
+   OS_Blocking_Signal(&fifo_uart_output.mtx_fifo_uart_output);
+   OS_Blocking_Signal(&fifo_uart_output.smphr_count_items);
 }

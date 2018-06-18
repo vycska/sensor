@@ -9,11 +9,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern int smphr_uart_input;
+
 volatile struct UART_Data uart_data;
 
 //baudrate: 9600, main_clock: 60000000, uartdiv: 250, divided_clock: 240000, mult: 144, u_pclk: 153600, brgval: 1
 //baudrate: 38400, main_clock: 60000000, uartdiv: 5, divided_clock: 12000000, mult: 244, u_pclk: 6144000, brgcal: 10
-void UART0_Init(void) {
+void UART_Init(void) {
    USART0CFG &= (~(1<<0)); //disable usart0
    PINENABLE0 |= (1<<0 | 1<<24); //disable ACMP_I1 on PIO0_0, disable ADC_11 on PIO0_4
    PINASSIGN0 = (PINASSIGN0&(~(0xff<<0 | 0xff<<8))) | (4<<0 | 0<<8); //U0TXD assigned to PIO0_4, U0RXD assigned to PIO0_0
@@ -32,7 +34,7 @@ void UART0_Init(void) {
    USART0CFG = (1<<0 | 1<<2 | 0<<4 | 0<<6 | 0<<9 | 0<<11 | 0<<15); //USART0 enable, 8b data length, no parity, 1 stop bit, no flow control, asynchronous mode, no loopback mode
 }
 
-void UART0_Transmit(char *s) {
+void UART_Transmit(char *s) {
    int i,k=strlen(s);
    for(i=0;i<k+2;i++) { //+2 nes gale pridesim \r\n
       while((USART0STAT&(1<<2))==0); //wait until TXRDY
@@ -42,18 +44,19 @@ void UART0_Transmit(char *s) {
 
 void UART0_IRQHandler(void) {
    unsigned char c;
-
    if(USART0INTSTAT&(1<<0)) { //RXRDY
       c = USART0RXDAT&0xff;
       if(isprint(c)) {
          uart_data.s[uart_data.i] = c;
-         uart_data.i = (uart_data.i + 1) % UART_IN_MAX;
+         uart_data.i = (uart_data.i + 1) & (UART_IN_MAX-1);
       }
       else if(uart_data.i != 0) {
          //send received command to the FIFO buffer
+         ICER0 = (1<<3);
          uart_data.s[uart_data.i] = 0;
-         Fifo_Command_Parser_Put((char*)uart_data.s);
          uart_data.i = 0;
+         OS_Blocking_Signal(&smphr_uart_input);
+         OS_Suspend();
       }
    }
 }

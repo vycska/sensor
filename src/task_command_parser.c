@@ -23,6 +23,7 @@ void params_fill(char*,unsigned int*);
 int params_count(unsigned int*);
 int params_integer(char,unsigned int*);
 
+extern char _flash_start, _flash_end, _ram_start, _ram_end;
 extern volatile long long int millis;
 extern struct BME280_Data bme280_data;
 extern struct LED_Data led_data;
@@ -36,7 +37,7 @@ void Task_Command_Parser(void) {
    int i, l;
    unsigned int t, params[8];
 
-   output("Task_Command_Parser has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   //output("Task_Command_Parser has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
 
    while(1) {
       Fifo_Command_Parser_Get(&pString);
@@ -72,8 +73,10 @@ void Task_Command_Parser(void) {
             if(params_count(params)==2 && !params_integer(2,params)) {
                for(t=0, l=1,i=strlen((char*)params[2])-1; i>=2; l*= 16, i--)
                   t += l * (((char*)params[2])[i]>='0' && ((char*)params[2])[i]<='9' ? (((char*)params[2])[i]-'0') : (((char*)params[2])[i]>='a' && ((char*)params[2])[i]<='f' ? (10+((char*)params[2])[i]-'a') : (0)));
-               mysprintf(buf,"0x%x : 0x%x",t,*((unsigned int*)t));
-               output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               if((t&3)==0 && ((t>=(unsigned int)&_flash_start && t<=(unsigned int)&_flash_end) || (t>=(unsigned int)&_ram_start && t<=(unsigned int)&_ram_end))) {
+                  mysprintf(buf,"0x%x : 0x%x",t,*((unsigned int*)t));
+                  output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
+               }
             }
             break;
          case 0x3f19: //output_mask

@@ -1,0 +1,38 @@
+1. protoboard 9x7cm                                   x10 $2.93
+2. Li-ion battery 18650 LiitoKala 3400mAh             x6 $16.32
+3. 18650 battery holder                               x5 $1.43
+4. TP4056 lithium battery charger module              x2 $0.68
+5. self-locking switch                                x20 $0.95
+6. capacitor ceramic 1uf      2pcs
+7. voltage regulator MPC1700
+8. microcontroller LPC824
+9. SOP20 adapter board                                x20 $1.76
+10. LED, low current
+11. 0.96'' OLED display SSD1306                       x1 $2.41
+12. BME280 sensor                                     x1 $3.22
+13. DS18B20 waterproof sensor probe                   x1 $1.03
+14. tactile switch                                    x100 $1.35
+15. male pin headers:
+   - 10 pin strip (LPC824)
+   - 10 pin strip (LPC824)
+   - 4 pin strip (BME280)
+   - 2 pin strip (ISP)
+   - 3 pin strip (UART)
+16. resistors
+   - 4k7 (DS18B20)
+   - 3k3 2pcs (ADC)
+   - 480 (LED)
+   - 10k (ISP)
+17. RJ45 8P8C socket                                  x20 $1.98
+18. Ethernet cable UTP CAT 5E
+19. Ethernet male plug
+20. shortcut wires
+   - 5 hole strip (B+)
+   - 6 hole strip (switch)
+   - 3 hole strip (RJ45)
+   - 7 hole strip (ADC)
+   - 3 hole strip (UART)
+   - 6 hole strip (ISP)
+   - 8 hole strip (switch)
+   - 6 hole strip (BME280)
+   - 6 hole strip (VDD)

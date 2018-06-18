@@ -1,4 +1,4 @@
-png("board-back.png",1000,750)
+png("board_back.png",1000,750)
 
 par(mar=c(0,0,0,0),oma=c(0,0,0,0))
 

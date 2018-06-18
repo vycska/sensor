@@ -17,7 +17,7 @@ void Task_DS18B20(void) {
    int i,k,l;
    double t;
 
-   output("Task_DS18B20 has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   //output("Task_DS18B20 has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
 
    DS18B20_Init();
 
