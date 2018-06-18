@@ -31,11 +31,10 @@ int mtx_i2c0,mtx_mrt1;
 volatile long long int millis;
 
 void main(void) {
-   //char buf[32];
-   //int t; 
+   char buf[32];
+   int t; 
 
-   //t = config_load();
-   config_load();
+   t = config_load();
 
    PDRUNCFG &= (~(1<<0 | 1<<1 | 1<<2 | 1<<4 | 1<<7)); //IRC output, IRC, flash, ADC, PLL powered
    SYSAHBCLKCTRL |= (1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<10 | 1<<14 | 1<<18 | 1<<24); //enable clock for ROM, RAM0_1, FLASHREG, FLASH, I2C0, GPIO, SWM, MRT, USART0, IOCON, ADC
@@ -44,9 +43,9 @@ void main(void) {
    PLL_Init();
    ADC_Init();
    I2C0_Init();
-   UART_Init();
-   MRT2_Init(1000);
    LED_Init();
+   MRT2_Init(1000);
+   UART_Init();
 
    Fifo_Uart_Output_Init();
    Fifo_Command_Parser_Init();
@@ -54,7 +53,6 @@ void main(void) {
    OS_InitSemaphore(&mtx_i2c0,1);
    OS_InitSemaphore(&mtx_mrt1,1);
 
-   /*
    mysprintf(buf,"VERSION: %d",VERSION);
    output(buf,eOutputSubsystemSystem, eOutputLevelImportant, -1);
 
@@ -95,15 +93,14 @@ void main(void) {
 
    mysprintf(buf, "_heap_size: %u", (unsigned int)&_heap_size);
    output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-   */
 
    OS_Init(NUMTHREADS,
-         "oled",              7,    Task_Oled,
          "switch",            3,    Task_Switch,
-         //"uart_input",        3,    Task_Uart_Input,
+         "uart_input",        3,    Task_Uart_Input,
          "command_parser",    4,    Task_Command_Parser,
          "bme280",            6,    Task_BME280,
          "ds18b20",           6,    Task_DS18B20,
+         "oled",              7,    Task_Oled,
          "uart_output",       8,    Task_Uart_Output,
          "idle",              31,   Task_Idle);
    OS_Start();

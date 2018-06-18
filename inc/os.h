@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#define NUMTHREADS	7      // number of threads
-#define STACKSIZE	160    // number of 32-bit words in stack
+#define NUMTHREADS	8      // number of threads
+#define STACKSIZE	144    // number of 32-bit words in stack
 
 struct tcb {
    int *sp, *block, sleep;

@@ -3,6 +3,6 @@
 
 void Task_Idle(void) {
    while(1) {
-      //WaitForInterrupt();
+      WaitForInterrupt();
    }
 }

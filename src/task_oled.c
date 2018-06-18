@@ -29,7 +29,7 @@ void Task_Oled(void) {
    char buf[96],buf2[16];
    double v;
 
-   //output("Task_Oled has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   output("Task_Oled has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
 
    DisableInterrupts();
    u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2,U8G2_R0,u8x8_byte_sw_i2c,u8x8_gpio_and_delay); //init u8g2 structure

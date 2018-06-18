@@ -10,7 +10,7 @@ extern volatile struct UART_Data uart_data;
 int smphr_uart_input;
 
 void Task_Uart_Input(void) {
-   //output("Task_Uart_Input has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   output("Task_Uart_Input has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
    OS_InitSemaphore(&smphr_uart_input, 0);
    while(1) {
       OS_Blocking_Wait(&smphr_uart_input);

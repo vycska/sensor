@@ -37,7 +37,7 @@ void Task_Command_Parser(void) {
    int i, l;
    unsigned int t, params[8];
 
-   //output("Task_Command_Parser has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   output("Task_Command_Parser has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
 
    while(1) {
       Fifo_Command_Parser_Get(&pString);
