@@ -20,6 +20,22 @@ void MRT0_Init(void) {
    INTVAL0 = (1*CLOCK*1000) | 1u<<31; //load value for 1 ms, force load
 }
 
+void MRT1_Delay(int ns) {
+   CTRL1 = (0<<0 | 1<<1); //interrupt disable, one-shot interrupt mode
+   INTVAL1 = (MAX2(ns*CLOCK/1000,1)) | (1u<<31);
+   while(STAT1&(1<<1)); //wait while timer is running
+}
+
+void MRT2_Init(int ms) { //paleidzia ADC matavimus
+   CTRL2 = (1<<0 | 0<<1); //enable interrupt, repeat interrupt mode
+   INTVAL2 = (ms*CLOCK*1000) | (1u<<31);
+}
+
+void MRT3_Delay(int us) {
+   CTRL3 = (0<<0 | 1<<1); //interrupt disable, one-shot interrupt mode
+   INTVAL3 = (us*CLOCK) | (1u<<31);
+   while(STAT3&(1<<1)); //wait while timer is running
+}
 void MRT_IRQHandler(void) {
    if(STAT0&(1<<0)) { //TIMER0 -- process sleeping threads
       struct tcb *cursor;
@@ -62,22 +78,4 @@ void MRT_IRQHandler(void) {
    if(STAT3&(1<<0)) { //TIMER3
       STAT3 |= (1<<0);
    }
-}
-
-void MRT1_Delay(int ns) {
-   CTRL1 = (0<<0 | 1<<1); //interrupt disable, one-shot interrupt mode
-   INTVAL1 = (MAX2(ns*CLOCK/1000,1)) | (1u<<31);
-   while(STAT1&(1<<1)); //wait while timer is running
-}
-
-void MRT2_Init(int ms) { //paleidzia ADC matavimus
-   CTRL2 = (1<<0 | 0<<1); //enable interrupt, repeat interrupt mode
-   INTVAL2 = (ms*CLOCK*1000) | (1u<<31);
-}
-
-
-void MRT3_Delay(int us) {
-   CTRL3 = (0<<0 | 1<<1); //interrupt disable, one-shot interrupt mode
-   INTVAL3 = (us*CLOCK) | (1u<<31);
-   while(STAT3&(1<<1)); //wait while timer is running
 }

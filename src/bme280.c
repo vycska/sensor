@@ -5,8 +5,6 @@
 #include "utils.h"
 #include "lpc824.h"
 
-extern int mtx_i2c0;
-
 struct BME280_Data bme280_data;
 
 int BME280_RegisterRead(unsigned int r, unsigned char *d, int l) {
@@ -14,7 +12,6 @@ int BME280_RegisterRead(unsigned int r, unsigned char *d, int l) {
    int ok;
    struct I2C i2c;
 
-   OS_Spinning_Wait(&mtx_i2c0);
    i2c.slave = BME280_SLAVE;
    i2c.direction = 2;        //write then read
    reg[0] = r;
@@ -23,7 +20,6 @@ int BME280_RegisterRead(unsigned int r, unsigned char *d, int l) {
    i2c.buffer[1] = d;
    i2c.length[1] = l;
    ok = I2C0_Transaction(&i2c);
-   OS_Spinning_Signal(&mtx_i2c0);
    return ok;
 }
 
@@ -32,7 +28,6 @@ int BME280_RegisterWrite(unsigned int r, unsigned char *d, int l) {
    int ok;
    struct I2C i2c;
 
-   OS_Spinning_Wait(&mtx_i2c0);
    i2c.slave = BME280_SLAVE;
    i2c.direction = 0;        //write
    reg[0] = r;
@@ -41,7 +36,6 @@ int BME280_RegisterWrite(unsigned int r, unsigned char *d, int l) {
    i2c.buffer[1] = d;
    i2c.length[1] = l;
    ok = I2C0_Transaction(&i2c);
-   OS_Spinning_Signal(&mtx_i2c0);
    return ok;
 }
 

@@ -27,12 +27,11 @@ extern char _data_start_lma, _data_start, _data_end, _bss_start, _bss_end;
 extern char _flash_start, _flash_end, _ram_start, _ram_end;
 extern char _intvecs_size, _text_size, _rodata_size, _data_size, _bss_size, _stack_size, _heap_size;
 
-int mtx_i2c0,mtx_mrt1;
 volatile long long int millis;
 
 void main(void) {
    char buf[32];
-   int t; 
+   int i,t; 
 
    t = config_load();
 
@@ -50,49 +49,59 @@ void main(void) {
    Fifo_Uart_Output_Init();
    Fifo_Command_Parser_Init();
 
-   OS_InitSemaphore(&mtx_i2c0,1);
-   OS_InitSemaphore(&mtx_mrt1,1);
-
-   mysprintf(buf,"VERSION: %d",VERSION);
-   output(buf,eOutputSubsystemSystem, eOutputLevelImportant, -1);
-
-   output(__DATE__,eOutputSubsystemSystem, eOutputLevelImportant, -1);
-   output(__TIME__,eOutputSubsystemSystem, eOutputLevelImportant, -1);
-
-   output(t?"config_load error":"config_load ok", eOutputSubsystemSystem, eOutputLevelImportant, -1);
-
-   mysprintf(buf, "_flash_start: %x [%u]", (unsigned int)&_flash_start,(unsigned int)&_flash_start);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_flash_end: %x [%u]", (unsigned int)&_flash_end,(unsigned int)&_flash_end);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_ram_start: %x [%u]", (unsigned int)&_ram_start,(unsigned int)&_ram_start);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_ram_end: %x [%u]", (unsigned int)&_ram_end,(unsigned int)&_ram_end);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_intvecs_size: %u", (unsigned int)&_intvecs_size);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_text_size: %u", (unsigned int)&_text_size);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_rodata_size: %u", (unsigned int)&_rodata_size);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_data_size: %u", (unsigned int)&_data_size);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_bss_size: %u", (unsigned int)&_bss_size);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_stack_size: %u", (unsigned int)&_stack_size);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
-
-   mysprintf(buf, "_heap_size: %u", (unsigned int)&_heap_size);
-   output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
+   for(i=0; i<=15; i++) {
+      switch(i) {
+         case 0:
+            mysprintf(buf,"VERSION: %d",VERSION);
+            break;
+         case 1:
+            mysprintf(buf,"%s %s",__DATE__,__TIME__);
+            break;
+         case 2:
+            mysprintf(buf,"%s",t?"config_load error":"config_load ok");
+            break;
+         case 3:
+            mysprintf(buf, "_flash_start: %x [%u]", (unsigned int)&_flash_start,(unsigned int)&_flash_start);
+            break;
+         case 4:
+            mysprintf(buf, "_flash_end: %x [%u]", (unsigned int)&_flash_end,(unsigned int)&_flash_end);
+            break;
+         case 5:
+            mysprintf(buf, "_ram_start: %x [%u]", (unsigned int)&_ram_start,(unsigned int)&_ram_start);
+            break;
+         case 6:
+            mysprintf(buf, "_ram_end: %x [%u]", (unsigned int)&_ram_end,(unsigned int)&_ram_end);
+            break;
+         case 7:
+            mysprintf(buf, "_intvecs_size: %u", (unsigned int)&_intvecs_size);
+            break;
+         case 8:
+            mysprintf(buf, "_text_size: %u", (unsigned int)&_text_size);
+            break;
+         case 9:
+            mysprintf(buf, "_rodata_size: %u", (unsigned int)&_rodata_size);
+            break;
+         case 10:
+            mysprintf(buf, "_data_size: %u", (unsigned int)&_data_size);
+            break;
+         case 11:
+            mysprintf(buf, "_bss_size: %u", (unsigned int)&_bss_size);
+            break;
+         case 12:
+            mysprintf(buf, "_stack_size: %u", (unsigned int)&_stack_size);
+            break;
+         case 13:
+            mysprintf(buf, "_heap_size: %u", (unsigned int)&_heap_size);
+            break;
+         case 14:
+            mysprintf(buf, "total flash used: %u",(unsigned int)&_intvecs_size+(unsigned int)&_text_size+(unsigned int)&_rodata_size);
+            break;
+         case 15:
+            mysprintf(buf, "total ram used: %u",(unsigned int)&_data_size+(unsigned int)&_bss_size+(unsigned int)&_stack_size+(unsigned int)&_heap_size);
+            break;
+      }
+      output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
+   }
 
    OS_Init(NUMTHREADS,
          "switch",            3,    Task_Switch,
