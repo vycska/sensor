@@ -1,7 +1,7 @@
 #ifndef __I2C_H__
 #define __I2C_H__
 
-struct I2C {
+struct I2C_Data {
    unsigned char *buffer[2],
                  slave,
                  direction;
@@ -9,6 +9,7 @@ struct I2C {
 };
 
 void I2C0_Init(void);
-int I2C0_Transaction(struct I2C*);
+void I2C1_Init(void);
+int I2C_Transaction(int,struct I2C_Data*);
 
 #endif

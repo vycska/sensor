@@ -10,7 +10,7 @@ struct BME280_Data bme280_data;
 int BME280_RegisterRead(unsigned int r, unsigned char *d, int l) {
    unsigned char reg[1];
    int ok;
-   struct I2C i2c;
+   struct I2C_Data i2c;
 
    i2c.slave = BME280_SLAVE;
    i2c.direction = 2;        //write then read
@@ -19,14 +19,14 @@ int BME280_RegisterRead(unsigned int r, unsigned char *d, int l) {
    i2c.length[0] = 1;
    i2c.buffer[1] = d;
    i2c.length[1] = l;
-   ok = I2C0_Transaction(&i2c);
+   ok = I2C_Transaction(0,&i2c);
    return ok;
 }
 
 int BME280_RegisterWrite(unsigned int r, unsigned char *d, int l) {
    unsigned char reg[1];
    int ok;
-   struct I2C i2c;
+   struct I2C_Data i2c;
 
    i2c.slave = BME280_SLAVE;
    i2c.direction = 0;        //write
@@ -35,7 +35,7 @@ int BME280_RegisterWrite(unsigned int r, unsigned char *d, int l) {
    i2c.length[0] = 1;
    i2c.buffer[1] = d;
    i2c.length[1] = l;
-   ok = I2C0_Transaction(&i2c);
+   ok = I2C_Transaction(0,&i2c);
    return ok;
 }
 

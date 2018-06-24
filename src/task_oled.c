@@ -1,19 +1,22 @@
 #include "task_oled.h"
 #include "adc.h"
 #include "fifos.h"
+#include "i2c.h"
+#include "main.h"
+#include "mrt.h"
 #include "os.h"
+#include "output.h"
 #include "switch.h"
 #include "task_bme280.h"
 #include "task_ds18b20.h"
-#include "main.h"
-#include "mrt.h"
-#include "output.h"
 #include "u8g2.h"
 #include "utils-asm.h"
 #include "utils.h"
 #include "lpc824.h"
 
-uint8_t u8x8_gpio_and_delay(u8x8_t*,uint8_t,uint8_t,void*);
+uint8_t u8x8_gpio_and_delay_sw(u8x8_t*,uint8_t,uint8_t,void*);
+uint8_t u8x8_byte_hw_i2c(u8x8_t*,uint8_t,uint8_t,void*);
+uint8_t u8x8_gpio_and_delay_hw(u8x8_t*,uint8_t,uint8_t,void*);
 
 extern volatile long long int millis;
 extern struct tcb *RunPt;
@@ -22,8 +25,8 @@ extern volatile struct Switch_Data switch_data;
 extern struct Task_BME280_Data task_bme280_data;
 extern struct Task_DS18B20_Data task_ds18b20_data;
 
-struct Task_Oled_Data task_oled_data = {0,5};
 u8g2_t u8g2; //a structure which contains all the data for one display
+struct Task_Oled_Data task_oled_data = {0,5};
 
 void Task_Oled(void) {
    char buf[96],buf2[16];
@@ -32,7 +35,8 @@ void Task_Oled(void) {
    output("Task_Oled has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
 
    DisableInterrupts();
-   u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2,U8G2_R0,u8x8_byte_sw_i2c,u8x8_gpio_and_delay); //init u8g2 structure
+   //u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2,U8G2_R0,u8x8_byte_sw_i2c,u8x8_gpio_and_delay_sw); //init u8g2 structure
+   u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2, U8G2_R0, u8x8_byte_hw_i2c, u8x8_gpio_and_delay_hw); //su hardware'iniu i2c
    u8g2_InitDisplay(&u8g2); //send init sequence to the display, display is in sleep mode
    u8g2_SetPowerSave(&u8g2,0); //wake up display
    EnableInterrupts();
@@ -111,7 +115,7 @@ void Task_Oled(void) {
    }
 }
 
-uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8,uint8_t msg,uint8_t arg_int,void *arg_ptr) {
+uint8_t u8x8_gpio_and_delay_sw(u8x8_t *u8x8,uint8_t msg,uint8_t arg_int,void *arg_ptr) {
    switch(msg) {
       case U8X8_MSG_GPIO_AND_DELAY_INIT: //called once during init phase of u8g2; can be used to setup pins
 #if BOARD == BOARD_TEST
@@ -169,6 +173,54 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8,uint8_t msg,uint8_t arg_int,void *arg_p
          if(arg_int==0) CLR0 = (1<<17);
          else SET0 = (1<<17);
 #endif
+         break;
+      default:
+         u8x8_SetGPIOResult(u8x8,1); //default return value
+         break;
+   }
+   return 1;
+}
+
+uint8_t u8x8_byte_hw_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
+   static unsigned char buf_idx,
+                        buffer[32]; //u8g2/u8x8 will never send more than 32B between START_TRANSFER and END_TRANSFER
+   static struct I2C_Data i2c_data;
+   unsigned char *data;
+
+   switch(msg) {
+      case U8X8_MSG_BYTE_INIT: //send once during the init phase of the display
+         I2C1_Init();
+         i2c_data.slave = u8x8_GetI2CAddress(u8x8)>>1;
+         i2c_data.direction = 0;
+         i2c_data.buffer[0] = buffer;
+         i2c_data.length[1] = 0;
+         i2c_data.buffer[1] = NULL;
+         break;
+      case U8X8_MSG_BYTE_SET_DC: //ignored for i2c
+         break;
+      case U8X8_MSG_BYTE_START_TRANSFER:
+         i2c_data.length[0] = buf_idx = 0;
+         break;
+      case U8X8_MSG_BYTE_SEND: //send one or more bytes
+         i2c_data.length[0] += arg_int;
+         for(data=(unsigned char*)arg_ptr; arg_int>0; arg_int--)
+            buffer[buf_idx++] = *data++;
+         break;
+      case U8X8_MSG_BYTE_END_TRANSFER:
+         I2C_Transaction(1,&i2c_data);
+         break;
+      default:
+         return 0;
+   }
+   return 1;
+}
+
+uint8_t u8x8_gpio_and_delay_hw(u8x8_t *u8x8,uint8_t msg,uint8_t arg_int,void *arg_ptr) {
+   switch(msg) {
+      case U8X8_MSG_GPIO_AND_DELAY_INIT: //called once during init phase of u8g2; can be used to setup pins
+         break;
+      case U8X8_MSG_DELAY_MILLI: //delay arg_int*1 milli second
+         MRT1_Delay(arg_int*1000*1000);
          break;
       default:
          u8x8_SetGPIOResult(u8x8,1); //default return value

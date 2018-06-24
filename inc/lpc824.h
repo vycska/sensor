@@ -145,85 +145,35 @@
 #define PINASSIGN11                    (*((volatile uint32_t*)0x4000c02c)) //pin assign register 11
 #define PINENABLE0                     (*((volatile uint32_t*)0x4000c1c0)) //pin enable register
 
-//I2C0
-#define I2C0CFG                        (*((volatile uint32_t*)0x40050000)) //configuration for shared functions
-#define I2C0STAT                       (*((volatile uint32_t*)0x40050004)) //status register for master, slave, and monitor functions
-#define I2C0INTENSET                   (*((volatile uint32_t*)0x40050008)) //interrupt enable set and read register
-#define I2C0INTENCLR                   (*((volatile uint32_t*)0x4005000c)) //interrupt enable clear register
-#define I2C0TIMEOUT                    (*((volatile uint32_t*)0x40050010)) //time-out value register
-#define I2C0CLKDIV                     (*((volatile uint32_t*)0x40050014)) //clock pre-divider for the entire i2c block
-#define I2C0INTSTAT                    (*((volatile uint32_t*)0x40050018)) //interrupt status register for master, slave, and monitor functions
-#define I2C0MSTCTL                     (*((volatile uint32_t*)0x40050020)) //master control register
-#define I2C0MSTTIME                    (*((volatile uint32_t*)0x40050024)) //master timing configuration
-#define I2C0MSTDAT                     (*((volatile uint32_t*)0x40050028)) //combined master receiver and transmitter data register
-#define I2C0SLVCTL                     (*((volatile uint32_t*)0x40050040)) //slave control register
-#define I2C0SLVDAT                     (*((volatile uint32_t*)0x40050044)) //combined slave receiver and transmitter data register
-#define I2C0SLVADR0                    (*((volatile uint32_t*)0x40050048)) //slave address 0
-#define I2C0SLVADR1                    (*((volatile uint32_t*)0x4005004c)) //slave address 1
-#define I2C0SLVADR2                    (*((volatile uint32_t*)0x40050050)) //slave address 2
-#define I2C0SLVADR3                    (*((volatile uint32_t*)0x40050054)) //slave address 3
-#define I2C0SLVQUAL0                   (*((volatile uint32_t*)0x40050058)) //slave qualification for address 0
-#define I2C0MONRXDAT                   (*((volatile uint32_t*)0x40050080)) //monitor receiver data register
+//I2C
+struct I2C_Registers {
+   volatile uint32_t CFG,              //configuration for shared functions
+                     STAT,             //status register for master, slave, and monitor functions
+                     INTENSET,         //interrupt enable set and read register
+                     INTENCLR,         //interrupt enable clear register
+                     TIMEOUT,          //time-out value register
+                     CLKDIV,           //clock pre-divider for the entire I2C block
+                     INTSTAT,          //interrupt status register for master, slave, and monitor functions
+                     reserved_1,
+                     MSTCTL,           //master control register
+                     MSTTIME,          //master timing configuration
+                     MSTDAT,           //combined master receiver and transmitter data register
+                     reserved_2[5],
+                     SLVCTL,           //slave control register
+                     SLVDAT,           //combined slave receiver and transmitter data register
+                     SLVADR0,          //slave address 0
+                     SLVADR1,          //slave address 1
+                     SLVADR2,          //slave address 2
+                     SLVADR3,          //slave address 3
+                     SLVQUAL0,         //slave qualification for address 0
+                     reserved_3[9],
+                     MONRXDAT;         //monitor receiver data register
+};
 
-//I2C1
-#define I2C1CFG                        (*((volatile uint32_t*)0x40054000)) //configuration for shared functions
-#define I2C1STAT                       (*((volatile uint32_t*)0x40054004)) //status register for master, slave, and monitor functions
-#define I2C1INTENSET                   (*((volatile uint32_t*)0x40054008)) //interrupt enable set and read register
-#define I2C1INTENCLR                   (*((volatile uint32_t*)0x4005400c)) //interrupt enable clear register
-#define I2C1TIMEOUT                    (*((volatile uint32_t*)0x40054010)) //time-out value register
-#define I2C1CLKDIV                     (*((volatile uint32_t*)0x40054014)) //clock pre-divider for the entire i2c block
-#define I2C1INTSTAT                    (*((volatile uint32_t*)0x40054018)) //interrupt status register for master, slave, and monitor functions
-#define I2C1MSTCTL                     (*((volatile uint32_t*)0x40054020)) //master control register
-#define I2C1MSTTIME                    (*((volatile uint32_t*)0x40054024)) //master timing configuration
-#define I2C1MSTDAT                     (*((volatile uint32_t*)0x40054028)) //combined master receiver and transmitter data register
-#define I2C1SLVCTL                     (*((volatile uint32_t*)0x40054040)) //slave control register
-#define I2C1SLVDAT                     (*((volatile uint32_t*)0x40054044)) //combined slave receiver and transmitter data register
-#define I2C1SLVADR0                    (*((volatile uint32_t*)0x40054048)) //slave address 0
-#define I2C1SLVADR1                    (*((volatile uint32_t*)0x4005404c)) //slave address 1
-#define I2C1SLVADR2                    (*((volatile uint32_t*)0x40054050)) //slave address 2
-#define I2C1SLVADR3                    (*((volatile uint32_t*)0x40054054)) //slave address 3
-#define I2C1SLVQUAL0                   (*((volatile uint32_t*)0x40054058)) //slave qualification for address 0
-#define I2C1MONRXDAT                   (*((volatile uint32_t*)0x40054080)) //monitor receiver data register
-
-//I2C2
-#define I2C2CFG                        (*((volatile uint32_t*)0x40070000)) //configuration for shared functions
-#define I2C2STAT                       (*((volatile uint32_t*)0x40070004)) //status register for master, slave, and monitor functions
-#define I2C2INTENSET                   (*((volatile uint32_t*)0x40070008)) //interrupt enable set and read register
-#define I2C2INTENCLR                   (*((volatile uint32_t*)0x4007000c)) //interrupt enable clear register
-#define I2C2TIMEOUT                    (*((volatile uint32_t*)0x40070010)) //time-out value register
-#define I2C2CLKDIV                     (*((volatile uint32_t*)0x40070014)) //clock pre-divider for the entire i2c block
-#define I2C2INTSTAT                    (*((volatile uint32_t*)0x40070018)) //interrupt status register for master, slave, and monitor functions
-#define I2C2MSTCTL                     (*((volatile uint32_t*)0x40070020)) //master control register
-#define I2C2MSTTIME                    (*((volatile uint32_t*)0x40070024)) //master timing configuration
-#define I2C2MSTDAT                     (*((volatile uint32_t*)0x40070028)) //combined master receiver and transmitter data register
-#define I2C2SLVCTL                     (*((volatile uint32_t*)0x40070040)) //slave control register
-#define I2C2SLVDAT                     (*((volatile uint32_t*)0x40070044)) //combined slave receiver and transmitter data register
-#define I2C2SLVADR0                    (*((volatile uint32_t*)0x40070048)) //slave address 0
-#define I2C2SLVADR1                    (*((volatile uint32_t*)0x4007004c)) //slave address 1
-#define I2C2SLVADR2                    (*((volatile uint32_t*)0x40070050)) //slave address 2
-#define I2C2SLVADR3                    (*((volatile uint32_t*)0x40070054)) //slave address 3
-#define I2C2SLVQUAL0                   (*((volatile uint32_t*)0x40070058)) //slave qualification for address 0
-#define I2C2MONRXDAT                   (*((volatile uint32_t*)0x40070080)) //monitor receiver data register
-
-//I2C3
-#define I2C3CFG                        (*((volatile uint32_t*)0x40074000)) //configuration for shared functions
-#define I2C3STAT                       (*((volatile uint32_t*)0x40074004)) //status register for master, slave, and monitor functions
-#define I2C3INTENSET                   (*((volatile uint32_t*)0x40074008)) //interrupt enable set and read register
-#define I2C3INTENCLR                   (*((volatile uint32_t*)0x4007400c)) //interrupt enable clear register
-#define I2C3TIMEOUT                    (*((volatile uint32_t*)0x40074010)) //time-out value register
-#define I2C3CLKDIV                     (*((volatile uint32_t*)0x40074014)) //clock pre-divider for the entire i2c block
-#define I2C3INTSTAT                    (*((volatile uint32_t*)0x40074018)) //interrupt status register for master, slave, and monitor functions
-#define I2C3MSTCTL                     (*((volatile uint32_t*)0x40074020)) //master control register
-#define I2C3MSTTIME                    (*((volatile uint32_t*)0x40074024)) //master timing configuration
-#define I2C3MSTDAT                     (*((volatile uint32_t*)0x40074028)) //combined master receiver and transmitter data register
-#define I2C3SLVCTL                     (*((volatile uint32_t*)0x40074040)) //slave control register
-#define I2C3SLVDAT                     (*((volatile uint32_t*)0x40074044)) //combined slave receiver and transmitter data register
-#define I2C3SLVADR0                    (*((volatile uint32_t*)0x40074048)) //slave address 0
-#define I2C3SLVADR1                    (*((volatile uint32_t*)0x4007404c)) //slave address 1
-#define I2C3SLVADR2                    (*((volatile uint32_t*)0x40074050)) //slave address 2
-#define I2C3SLVADR3                    (*((volatile uint32_t*)0x40074054)) //slave address 3
-#define I2C3SLVQUAL0                   (*((volatile uint32_t*)0x40074058)) //slave qualification for address 0
-#define I2C3MONRXDAT                   (*((volatile uint32_t*)0x40074080)) //monitor receiver data register
+#define I2C0 ((struct I2C_Registers*)(0x40050000))
+#define I2C1 ((struct I2C_Registers*)(0x40054000))
+#define I2C2 ((struct I2C_Registers*)(0x40070000))
+#define I2C3 ((struct I2C_Registers*)(0x40074000))
 
 //USART0
 #define USART0CFG                      (*((volatile uint32_t*)0x40064000)) //USART configuration register

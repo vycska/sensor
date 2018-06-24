@@ -36,8 +36,8 @@ void main(void) {
    t = config_load();
 
    PDRUNCFG &= (~(1<<0 | 1<<1 | 1<<2 | 1<<4 | 1<<7)); //IRC output, IRC, flash, ADC, PLL powered
-   SYSAHBCLKCTRL |= (1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<10 | 1<<14 | 1<<18 | 1<<24); //enable clock for ROM, RAM0_1, FLASHREG, FLASH, I2C0, GPIO, SWM, MRT, USART0, IOCON, ADC
-   PRESETCTRL |= (1<<2 | 1<<3 | 1<<6 | 1<<7 | 1<<10 | 1<<11); //clear USART FRG, USART0, I2C0, MRT, GPIO, flash controller reset
+   SYSAHBCLKCTRL |= (1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<10 | 1<<14 | 1<<18 | 1<<21 | 1<<24); //enable clock for ROM, RAM0_1, FLASHREG, FLASH, I2C0, GPIO, SWM, MRT, USART0, IOCON, I2C1, ADC
+   PRESETCTRL |= (1<<2 | 1<<3 | 1<<6 | 1<<7 | 1<<10 | 1<<11 | 1<<14); //clear USART FRG, USART0, I2C0, MRT, GPIO, flash controller, I2C1 reset
 
    PLL_Init();
    ADC_Init();
