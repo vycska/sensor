@@ -175,6 +175,6 @@ segments(10,2,8,3,lwd=3,col="black")
 segments(10,1,8,2,lwd=3,col="black")
 segments(c(8,5),c(1,1),c(5,5),c(1,3),lwd=3,col="black")
 segments(2,2,2,4,lwd=3,col="black")
-segments(15,9,16,9,lwd=3,col="green")
+segments(15,9,16,9,lwd=3,col="black")
 
 dev.off()

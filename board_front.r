@@ -196,6 +196,6 @@ segments(10,2,8,3,col="blue")
 segments(10,1,8,2,col="blue")
 segments(c(8,5),c(1,1),c(5,5),c(1,3),col="blue")
 segments(2,2,2,4,col="blue")
-segments(15,9,16,9,col="green")
+segments(15,9,16,9,col="black")
 
 dev.off()
