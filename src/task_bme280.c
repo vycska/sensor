@@ -15,7 +15,7 @@ void Task_BME280(void) {
    unsigned char id[1];
    double h, p, t;
 
-   output("Task_BME280 has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   output("Task_BME280 has started", eOutputSubsystemSystem, eOutputLevelDebug, 0);
 
    OS_Sleep(2); //max time for first communication
 
@@ -24,7 +24,7 @@ void Task_BME280(void) {
    BME280_GetID(id);
 
    mysprintf(s,"BME280 id: %x",(unsigned int)id[0]);
-   output(s, eOutputSubsystemBME280, eOutputLevelNormal, 1);
+   output(s, eOutputSubsystemBME280, eOutputLevelDebug, 1);
 
    while(1) {
       BME280_StartForcedMeasurement();

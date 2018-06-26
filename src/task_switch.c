@@ -17,7 +17,7 @@ int smphr_switch;
 void Task_Switch(void) {
    char buf[32];
 
-   output("Task_Switch has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   output("Task_Switch has started", eOutputSubsystemSystem, eOutputLevelDebug, 0);
 
    Switch_Init();
 
@@ -42,6 +42,9 @@ void Task_Switch(void) {
                   break;
                case 3:
                   Fifo_Command_Parser_Put("uart_in_enabled");
+                  break;
+               case 4:
+                  Fifo_Command_Parser_Put("log_enabled");
                   break;
             }
             RISE = (1<<0);

@@ -32,12 +32,13 @@ extern struct Task_Oled_Data task_oled_data;
 extern volatile struct UART_Data uart_data;
 extern struct tcb *RunPt,tcbs[NUMTHREADS];
 
+
 void Task_Command_Parser(void) {
-   char *pString, buf[128];
+   char *pString,buf[128];
    int i, l;
    unsigned int t, params[8];
 
-   output("Task_Command_Parser has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   output("Task_Command_Parser has started", eOutputSubsystemSystem, eOutputLevelDebug, 0);
 
    while(1) {
       Fifo_Command_Parser_Get(&pString);
@@ -112,9 +113,9 @@ void Task_Command_Parser(void) {
          case 0xcb6e: //screen
             if(params_count(params)==2) {
                if(params[2]==0)
-                  task_oled_data.screen = (task_oled_data.total_screens+task_oled_data.screen-1)%task_oled_data.total_screens;
+                  task_oled_data.screen = (5+task_oled_data.screen-1)%5;
                else if(params[2]==1)
-                  task_oled_data.screen = (task_oled_data.screen+1)%task_oled_data.total_screens;
+                  task_oled_data.screen = (task_oled_data.screen+1)%5;
             }
             break;
          case 0xa577: //bme280_config
@@ -225,6 +226,9 @@ void Task_Command_Parser(void) {
                ISER0 = (1<<3);
                uart_data.uart_in_enabled = 1;
             }
+            break;
+         case 0x2b4a: //log_enabled
+            task_oled_data.log_enabled ^= 1;
             break;
          case 0xfb7e: //led_enabled
             led_data.enabled ^= 1;

@@ -31,7 +31,7 @@ void I2C1_Init(void) {
    PINASSIGN9 = (PINASSIGN9&(~((0xff<<8) | (0xff<<16)))) | (17<<8) | (13<<16); //I2C1_SDA on PIO0_17, I2C1_SCL on PIO0_13
 #endif
    I2C1->CLKDIV = (CLOCK-1); //pclk divider to produce function clock of 1MHz
-   I2C1->MSTTIME = (3<<0 | 3<<4); //SCL low time is 3+2, SCL high time is 3+2
+   I2C1->MSTTIME = (0<<0 | 0<<4); //SCL low time is 0+2, SCL high time is 0+2
    I2C1->TIMEOUT |= (0xfff<<4); //timeout value (will not be used)
    I2C1->INTENCLR = (1<<0 | 1<<4 | 1<<6 | 1<<8 | 1<<11 | 1<<15 | 1<<16 | 1<<17 | 1<<19 | 1<<24 | 1<<25); //no interrupts
    I2C1->CFG = (1<<0 | 0<<1 | 0<<2 | 0<<3 | 0<<4); //master enable, slave disable, monitor disabled, timeout disabled, monitor clock stretching disabled

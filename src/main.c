@@ -27,11 +27,15 @@ extern char _data_start_lma, _data_start, _data_end, _bss_start, _bss_end;
 extern char _flash_start, _flash_end, _ram_start, _ram_end;
 extern char _intvecs_size, _text_size, _rodata_size, _data_size, _bss_size, _stack_size, _heap_size;
 
+extern u8log_t u8log;
+extern u8g2_t u8g2;
+extern struct Task_Oled_Data task_oled_data;
+
 volatile long long int millis;
 
 void main(void) {
    char buf[32];
-   int i,t; 
+   int i, t;
 
    t = config_load();
 
@@ -48,6 +52,12 @@ void main(void) {
 
    Fifo_Uart_Output_Init();
    Fifo_Command_Parser_Init();
+
+   //u8g2_Setup_ssd1306_i2c_128x64_noname_f(&task_oled_data.u8g2,U8G2_R0,u8x8_byte_sw_i2c,u8x8_gpio_and_delay_sw); //init u8g2 structure
+   u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2, U8G2_R0, u8x8_byte_hw_i2c, u8x8_gpio_and_delay_hw); //su hardware'iniu i2c
+   u8log_Init(&u8log, 32, 10, task_oled_data.log_buffer);
+   u8log_SetCallback(&u8log, 0, &u8g2);
+   u8log_SetRedrawMode(&u8log, 0);
 
    for(i=0; i<=15; i++) {
       switch(i) {
@@ -94,10 +104,10 @@ void main(void) {
             mysprintf(buf, "_heap_size: %u", (unsigned int)&_heap_size);
             break;
          case 14:
-            mysprintf(buf, "total flash used: %u",(unsigned int)&_intvecs_size+(unsigned int)&_text_size+(unsigned int)&_rodata_size);
+            mysprintf(buf, "flash used: %u",(unsigned int)&_intvecs_size+(unsigned int)&_text_size+(unsigned int)&_rodata_size);
             break;
          case 15:
-            mysprintf(buf, "total ram used: %u",(unsigned int)&_data_size+(unsigned int)&_bss_size+(unsigned int)&_stack_size+(unsigned int)&_heap_size);
+            mysprintf(buf, "ram used: %u",(unsigned int)&_data_size+(unsigned int)&_bss_size+(unsigned int)&_stack_size+(unsigned int)&_heap_size);
             break;
       }
       output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);

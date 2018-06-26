@@ -9,14 +9,9 @@
 #include "switch.h"
 #include "task_bme280.h"
 #include "task_ds18b20.h"
-#include "u8g2.h"
 #include "utils-asm.h"
 #include "utils.h"
 #include "lpc824.h"
-
-uint8_t u8x8_gpio_and_delay_sw(u8x8_t*,uint8_t,uint8_t,void*);
-uint8_t u8x8_byte_hw_i2c(u8x8_t*,uint8_t,uint8_t,void*);
-uint8_t u8x8_gpio_and_delay_hw(u8x8_t*,uint8_t,uint8_t,void*);
 
 extern volatile long long int millis;
 extern struct tcb *RunPt;
@@ -25,91 +20,98 @@ extern volatile struct Switch_Data switch_data;
 extern struct Task_BME280_Data task_bme280_data;
 extern struct Task_DS18B20_Data task_ds18b20_data;
 
-u8g2_t u8g2; //a structure which contains all the data for one display
-struct Task_Oled_Data task_oled_data = {0,5};
+u8log_t u8log;
+u8g2_t u8g2;
+struct Task_Oled_Data task_oled_data;
 
 void Task_Oled(void) {
-   char buf[96],buf2[16];
+   char buf[32],buf2[16];
    double v;
 
-   output("Task_Oled has started", eOutputSubsystemSystem, eOutputLevelNormal, 0);
+   output("Task_Oled has started", eOutputSubsystemSystem, eOutputLevelDebug, 0);
 
-   DisableInterrupts();
-   //u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2,U8G2_R0,u8x8_byte_sw_i2c,u8x8_gpio_and_delay_sw); //init u8g2 structure
-   u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2, U8G2_R0, u8x8_byte_hw_i2c, u8x8_gpio_and_delay_hw); //su hardware'iniu i2c
    u8g2_InitDisplay(&u8g2); //send init sequence to the display, display is in sleep mode
    u8g2_SetPowerSave(&u8g2,0); //wake up display
-   EnableInterrupts();
+   u8g2_ClearBuffer(&u8g2);
 
    while(1) {
-      u8g2_ClearBuffer(&u8g2);
-
-      switch(task_oled_data.screen) {
-         case 0:
-            mysprintf(buf,"ds18b20: temper., %s","\xb0""C");
-            if(task_ds18b20_data.temperature!=DS18B20_ERROR_VALUE) {
-               v=task_ds18b20_data.temperature/100.0;
-               mysprintf(buf2,"%f1",(char*)&v);
-            }
-            else
-               mysprintf(buf2,"**.*");
-            break;
-         case 1:
-            mysprintf(buf,"bme280: temper., %s","\xb0""C");
-            if(task_bme280_data.t != BME280_ERROR_VALUE) {
-               v = task_bme280_data.t/100.0;
-               mysprintf(buf2,"%f1",(char*)&v);
-            }
-            else
-               mysprintf(buf2,"**.*");
-            break;
-         case 2:
-            mysprintf(buf,"bme280: dregme, %%");
-            if(task_bme280_data.h != BME280_ERROR_VALUE) {
-               v = task_bme280_data.h/100.0;
-               mysprintf(buf2,"%f1",(char*)&v);
-            }
-            else
-               mysprintf(buf2,"**.*");
-            break;
-         case 3:
-            mysprintf(buf,"bme280: slegis, mmHg");
-            if(task_bme280_data.p != BME280_ERROR_VALUE) {
-               v = task_bme280_data.p/100.0;
-               mysprintf(buf2,"%f1",(char*)&v);
-            }
-            else
-               mysprintf(buf2,"**.*");
-            break;
-         case 4: //adc
-#if BOARD == BOARD_TEST
-            mysprintf(buf, "2xAA baterijos, V");
-            v = ((double)adc_data.sum/adc_data.count)/4095.0*3.3;
-#elif BOARD == BOARD_RELEASE
-            mysprintf(buf,"Li-Ion baterija, V");
-            v = ((double)adc_data.sum/adc_data.count)/4095.0*3.3 * 2;
-#endif
-            mysprintf(buf2,"%f2",(char*)&v);
-            break;
+      if(task_oled_data.log_enabled) {
+         u8g2_FirstPage(&u8g2);
+         do {
+            u8g2_DrawLog(&u8g2, 0, u8g2_GetAscent(&u8g2), &u8log);
+         } while(u8g2_NextPage(&u8g2));
       }
-      if(switch_data.active)
-         switch((millis-switch_data.start)/4000) {
+      else {
+         switch(task_oled_data.screen) {
+            case 0:
+               mysprintf(buf,"ds18b20: temper., %s","\xb0""C");
+               if(task_ds18b20_data.temperature!=DS18B20_ERROR_VALUE) {
+                  v=task_ds18b20_data.temperature/100.0;
+                  mysprintf(buf2,"%f1",(char*)&v);
+               }
+               else
+                  mysprintf(buf2,"**.*");
+               break;
             case 1:
-               mysprintf(buf,"LED");
+               mysprintf(buf,"bme280: temper., %s","\xb0""C");
+               if(task_bme280_data.t != BME280_ERROR_VALUE) {
+                  v = task_bme280_data.t/100.0;
+                  mysprintf(buf2,"%f1",(char*)&v);
+               }
+               else
+                  mysprintf(buf2,"**.*");
                break;
             case 2:
-               mysprintf(buf,"config");
+               mysprintf(buf,"bme280: dregme, %%");
+               if(task_bme280_data.h != BME280_ERROR_VALUE) {
+                  v = task_bme280_data.h/100.0;
+                  mysprintf(buf2,"%f1",(char*)&v);
+               }
+               else
+                  mysprintf(buf2,"**.*");
                break;
             case 3:
-               mysprintf(buf,"UART");
+               mysprintf(buf,"bme280: slegis, mmHg");
+               if(task_bme280_data.p != BME280_ERROR_VALUE) {
+                  v = task_bme280_data.p/100.0;
+                  mysprintf(buf2,"%f1",(char*)&v);
+               }
+               else
+                  mysprintf(buf2,"**.*");
+               break;
+            case 4: //adc
+#if BOARD == BOARD_TEST
+               mysprintf(buf, "2xAA baterijos, V");
+               v = ((double)adc_data.sum/adc_data.count)/4095.0*3.3;
+#elif BOARD == BOARD_RELEASE
+               mysprintf(buf,"Li-Ion baterija, V");
+               v = ((double)adc_data.sum/adc_data.count)/4095.0*3.3 * 2;
+#endif
+               mysprintf(buf2,"%f2",(char*)&v);
                break;
          }
-      u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
-      u8g2_DrawStr(&u8g2,0,8,buf);
-      u8g2_SetFont(&u8g2,u8g2_font_fur35_tn);
-      u8g2_DrawStr(&u8g2,2,62,buf2);
-
-      u8g2_SendBuffer(&u8g2);
+         if(switch_data.active)
+            switch((millis-switch_data.start)/4000) {
+               case 1:
+                  mysprintf(buf,"LED");
+                  break;
+               case 2:
+                  mysprintf(buf,"config");
+                  break;
+               case 3:
+                  mysprintf(buf,"UART");
+                  break;
+               case 4:
+                  mysprintf(buf,"log");
+                  break;
+            }
+         u8g2_ClearBuffer(&u8g2);
+         u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
+         u8g2_DrawStr(&u8g2,0,8,buf);
+         u8g2_SetFont(&u8g2,u8g2_font_fur35_tn);
+         u8g2_DrawStr(&u8g2,2,62,buf2);
+         u8g2_SendBuffer(&u8g2);
+      }
 
       OS_Sleep(500);
    }

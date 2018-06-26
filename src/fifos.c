@@ -16,7 +16,7 @@ void Fifo_Command_Parser_Get(char **pString) {
    OS_Blocking_Wait(&fifo_command_parser.mtx_fifo_command_parser);
 
    *pString = fifo_command_parser.buffer[fifo_command_parser.i_get];
-   fifo_command_parser.i_get = (fifo_command_parser.i_get + 1) % FIFO_COMMAND_PARSER_ITEMS;
+   fifo_command_parser.i_get = (fifo_command_parser.i_get + 1) & (FIFO_COMMAND_PARSER_ITEMS-1);
 
    OS_Blocking_Signal(&fifo_command_parser.mtx_fifo_command_parser);
 }
@@ -25,7 +25,7 @@ void Fifo_Command_Parser_Put(char *pString) {
    OS_Blocking_Wait(&fifo_command_parser.mtx_fifo_command_parser);
 
    strcpy(fifo_command_parser.buffer[fifo_command_parser.i_put], pString);
-   fifo_command_parser.i_put = (fifo_command_parser.i_put + 1) % FIFO_COMMAND_PARSER_ITEMS;
+   fifo_command_parser.i_put = (fifo_command_parser.i_put + 1) & (FIFO_COMMAND_PARSER_ITEMS-1);
 
    OS_Blocking_Signal(&fifo_command_parser.mtx_fifo_command_parser);
    OS_Blocking_Signal(&fifo_command_parser.smphr_count_items);
