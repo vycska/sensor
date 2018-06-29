@@ -67,7 +67,7 @@ str r2,[r1]
 @save r0, which is RunPt address, and lr (0xfffffff9 probably) into the stack
 push {r0,lr}
 @run scheduler with argument RunPt in r0
-bl Scheduler
+bl OS_Scheduler
 @restore r0 and lr
 pop {r0,r1}
 mov lr,r1

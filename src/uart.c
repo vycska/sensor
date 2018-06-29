@@ -55,8 +55,8 @@ void UART0_IRQHandler(void) {
          ICER0 = (1<<3);
          uart_data.s[uart_data.i] = 0;
          uart_data.i = 0;
-         OS_Blocking_Signal(&smphr_uart_input);
-         OS_Suspend();
+         Task_Blocking_Signal(&smphr_uart_input);
+         Task_Suspend();
       }
    }
 }

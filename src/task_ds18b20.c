@@ -32,7 +32,7 @@ void Task_DS18B20(void) {
 
    while(1) {
       DS18B20_ConvertTAll();
-      OS_Sleep(750); //conversion time
+      Task_Sleep(750); //conversion time
       k = DS18B20_ReadScratchpad(0,data);
       if(k==DS18B20_OK) {
          t = DS18B20_GetTemperature(data);
@@ -43,6 +43,6 @@ void Task_DS18B20(void) {
       else {
          task_ds18b20_data.temperature = DS18B20_ERROR_VALUE;
       }
-      OS_Sleep(1000);
+      Task_Sleep(1000);
    }
 }

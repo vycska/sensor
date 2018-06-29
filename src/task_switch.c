@@ -21,10 +21,10 @@ void Task_Switch(void) {
 
    Switch_Init();
 
-   OS_InitSemaphore(&smphr_switch, 0);
+   Semaphore_Init(&smphr_switch, 0);
 
    while(1) {
-      OS_Blocking_Wait(&smphr_switch);
+      Task_Blocking_Wait(&smphr_switch);
       switch(switch_data.active) {
          case 1:
             Fifo_Command_Parser_Put("screen 1");

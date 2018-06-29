@@ -25,7 +25,7 @@
 
 extern char _data_start_lma, _data_start, _data_end, _bss_start, _bss_end;
 extern char _flash_start, _flash_end, _ram_start, _ram_end;
-extern char _intvecs_size, _text_size, _rodata_size, _data_size, _bss_size, _stack_size, _heap_size;
+extern char _intvecs_size, _text_size, _rodata_size, _data_size, _bss_size, _stack_size, _stacks_size, _heap_size;
 
 extern u8log_t u8log;
 extern u8g2_t u8g2;
@@ -59,7 +59,7 @@ void main(void) {
    u8log_SetCallback(&u8log, 0, &u8g2);
    u8log_SetRedrawMode(&u8log, 0);
 
-   for(i=0; i<=15; i++) {
+   for(i=0; i<=16; i++) {
       switch(i) {
          case 0:
             mysprintf(buf,"VERSION: %d",VERSION);
@@ -101,27 +101,30 @@ void main(void) {
             mysprintf(buf, "_stack_size: %u", (unsigned int)&_stack_size);
             break;
          case 13:
-            mysprintf(buf, "_heap_size: %u", (unsigned int)&_heap_size);
+            mysprintf(buf, "_stacks_size: %u", (unsigned int)&_stacks_size);
             break;
          case 14:
-            mysprintf(buf, "flash used: %u",(unsigned int)&_intvecs_size+(unsigned int)&_text_size+(unsigned int)&_rodata_size);
+            mysprintf(buf, "_heap_size: %u", (unsigned int)&_heap_size);
             break;
          case 15:
-            mysprintf(buf, "ram used: %u",(unsigned int)&_data_size+(unsigned int)&_bss_size+(unsigned int)&_stack_size+(unsigned int)&_heap_size);
+            mysprintf(buf, "flash used: %u",(unsigned int)&_intvecs_size+(unsigned int)&_text_size+(unsigned int)&_rodata_size+(unsigned int)&_data_size);
+            break;
+         case 16:
+            mysprintf(buf, "ram used: %u",(unsigned int)&_data_size+(unsigned int)&_bss_size+(unsigned int)&_stack_size+(unsigned int)&_stacks_size+(unsigned int)&_heap_size);
             break;
       }
-      output(buf, eOutputSubsystemSystem, eOutputLevelNormal, -1);
+      output(buf, eOutputSubsystemSystem, eOutputLevelImportant, -1);
    }
 
    OS_Init(NUMTHREADS,
-         "switch",            3,    Task_Switch,
-         "uart_input",        3,    Task_Uart_Input,
-         "command_parser",    4,    Task_Command_Parser,
-         "bme280",            6,    Task_BME280,
-         "ds18b20",           6,    Task_DS18B20,
-         "oled",              7,    Task_Oled,
-         "uart_output",       8,    Task_Uart_Output,
-         "idle",              31,   Task_Idle);
+         "switch",            3,    576,     Task_Switch,
+         "uart_input",        3,    576,     Task_Uart_Input,
+         "command_parser",    4,    576,     Task_Command_Parser,
+         "bme280",            6,    576,     Task_BME280,
+         "ds18b20",           6,    576,     Task_DS18B20,
+         "oled",              7,    576,     Task_Oled,
+         "uart_output",       8,    576,     Task_Uart_Output,
+         "idle",              31,   256,     Task_Idle);
    OS_Start();
 }
 

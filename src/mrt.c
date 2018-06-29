@@ -5,6 +5,7 @@
 #include "switch.h"
 #include "task_switch.h"
 #include "utils.h"
+#include "utils-asm.h"
 #include "lpc824.h"
 
 extern int smphr_switch;
@@ -38,6 +39,7 @@ void MRT3_Delay(int us) {
 }
 void MRT_IRQHandler(void) {
    if(STAT0&(1<<0)) { //TIMER0 -- process sleeping threads
+      unsigned int sp;
       struct tcb *cursor;
       STAT0 |= (1<<0); //clear the interrupt request
       millis += 1; //increment milliseconds timer
@@ -64,9 +66,13 @@ void MRT_IRQHandler(void) {
             switch_data.active = 0;
             switch_data.delay = 0;
             switch_data.duration = millis-switch_data.start-500;
-            OS_Blocking_Signal(&smphr_switch);
+            Task_Blocking_Signal(&smphr_switch);
          }
       }
+      //process stack usage
+      sp = _sp();
+      if(RunPt->stack_base - sp > RunPt->stack_maxusage)
+         RunPt->stack_maxusage = RunPt->stack_base - sp;
    }
    if(STAT1&(1<<0)) { //TIMER1
       STAT1 |= (1<<0);

@@ -62,8 +62,8 @@ void Task_Command_Parser(void) {
             break;
          case 0xca53: //task_info
             for(i = 0; i < NUMTHREADS; i++) {
-               mysprintf(buf, "%d %s %n pr: %d %n sp: %x sl: %d %n bl: %x",
-               (int)tcbs[i].id, tcbs[i].name, 20-strlen(tcbs[i].name), (int)tcbs[i].priority, 4-ndigits(tcbs[i].priority), tcbs[i].sp, tcbs[i].sleep, 7-ndigits(tcbs[i].sleep), tcbs[i].block);
+               mysprintf(buf, "%d %s %n pr: %d %n sp: %x sb: %x su: %d %n sl: %d %n bl: %x",
+               (int)tcbs[i].id, tcbs[i].name, 20-strlen(tcbs[i].name), (int)tcbs[i].priority, 4-ndigits(tcbs[i].priority), tcbs[i].stack_pointer, tcbs[i].stack_base, tcbs[i].stack_maxusage, 7-ndigits(tcbs[i].stack_maxusage), tcbs[i].sleep, 7-ndigits(tcbs[i].sleep), tcbs[i].block);
                output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
             }
             break;

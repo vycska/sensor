@@ -17,7 +17,7 @@ void Task_BME280(void) {
 
    output("Task_BME280 has started", eOutputSubsystemSystem, eOutputLevelDebug, 0);
 
-   OS_Sleep(2); //max time for first communication
+   Task_Sleep(2); //max time for first communication
 
    BME280_Init();
 
@@ -28,7 +28,7 @@ void Task_BME280(void) {
 
    while(1) {
       BME280_StartForcedMeasurement();
-      OS_Sleep(1.25 + 2.5 * power(2, bme280_data.os_t - 1) + 2.3 * power(2, bme280_data.os_p - 1) + 0.575 + 2.3 * power(2, bme280_data.os_h - 1) + 0.575);
+      Task_Sleep(1.25 + 2.5 * power(2, bme280_data.os_t - 1) + 2.3 * power(2, bme280_data.os_p - 1) + 0.575 + 2.3 * power(2, bme280_data.os_h - 1) + 0.575);
       BME280_GetValue(&h, &p, &t);
 
       mysprintf(s, "T: %f1 C", (char *)&t);
@@ -42,6 +42,6 @@ void Task_BME280(void) {
       task_bme280_data.p = p * 100;
       task_bme280_data.t = t * 100;
 
-      OS_Sleep(2000);
+      Task_Sleep(2000);
    }
 }

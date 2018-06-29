@@ -45,6 +45,12 @@ SECTIONS
       _stack_end = .;
    } > ram
 
+   .stacks (NOLOAD) : {
+      _stacks_start = .;
+      *(.stacks)
+      _stacks_end = .;
+   } > ram
+
    .data : {
       _data_start = .;
       *(.data*)
@@ -72,5 +78,6 @@ SECTIONS
    _data_size = SIZEOF (.data);
    _bss_size = SIZEOF (.bss);
    _stack_size = SIZEOF(.stack);
+   _stacks_size = SIZEOF(.stacks);
    _heap_size = SIZEOF(.heap);
 }

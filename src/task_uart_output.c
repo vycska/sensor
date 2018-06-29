@@ -15,6 +15,6 @@ void Task_Uart_Output(void) {
       Fifo_Uart_Output_Get(&pString, &smphrFinished);
       UART_Transmit(pString);
       if(smphrFinished)
-         OS_Blocking_Signal(smphrFinished);
+         Task_Blocking_Signal(smphrFinished);
    }
 }

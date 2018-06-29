@@ -11,9 +11,9 @@ int smphr_uart_input;
 
 void Task_Uart_Input(void) {
    output("Task_Uart_Input has started", eOutputSubsystemSystem, eOutputLevelDebug, 0);
-   OS_InitSemaphore(&smphr_uart_input, 0);
+   Semaphore_Init(&smphr_uart_input, 0);
    while(1) {
-      OS_Blocking_Wait(&smphr_uart_input);
+      Task_Blocking_Wait(&smphr_uart_input);
       Fifo_Command_Parser_Put((char*)uart_data.s);
       ISER0 = (1<<3);
    }

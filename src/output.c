@@ -23,9 +23,9 @@ void output(char *buf, enum eOutputSubsystem subsystem, enum eOutputLevel level,
          UART_Transmit(buf);
       }
       else if(block==1) {
-         OS_InitSemaphore(&smphrFinished,0);
+         Semaphore_Init(&smphrFinished,0);
          Fifo_Uart_Output_Put(buf, &smphrFinished);
-         OS_Blocking_Wait(&smphrFinished);
+         Task_Blocking_Wait(&smphrFinished);
       }
       else if(block==0) {
          Fifo_Uart_Output_Put(buf, 0);

@@ -10,5 +10,6 @@ void EndCritical(int);
 void WaitForInterrupt(void);
 uint32_t GetPSR(void);
 void _DSB(void);
+unsigned int _sp(void);
 
 #endif

@@ -11,6 +11,7 @@
 .global WaitForInterrupt
 .global GetPSR
 .global _DSB
+.global _sp
 
 .thumb_func
 DisableInterrupts:
@@ -46,6 +47,11 @@ bx lr
 .thumb_func
 _DSB:
 dsb sy
+bx lr
+
+.thumb_func
+_sp:
+mrs r0,msp
 bx lr
 
 .end

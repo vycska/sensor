@@ -44,7 +44,7 @@ void PININT0_IRQHandler(void) {
       switch_data.active = 1;
       switch_data.delay = 0;
       switch_data.start = millis;
-      OS_Blocking_Signal(&smphr_switch);
-      OS_Suspend();
+      Task_Blocking_Signal(&smphr_switch);
+      Task_Suspend();
    }
 }
