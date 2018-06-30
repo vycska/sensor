@@ -71,8 +71,8 @@ void MRT_IRQHandler(void) {
       }
       //process stack usage
       sp = _sp();
-      if(RunPt->stack_base - sp > RunPt->stack_maxusage)
-         RunPt->stack_maxusage = RunPt->stack_base - sp;
+      if((unsigned int)RunPt->stack_base - sp > RunPt->stack_usage)
+         RunPt->stack_usage = (unsigned int)RunPt->stack_base - sp;
    }
    if(STAT1&(1<<0)) { //TIMER1
       STAT1 |= (1<<0);

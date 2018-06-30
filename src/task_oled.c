@@ -30,7 +30,7 @@ void Task_Oled(void) {
 
    output("Task_Oled has started", eOutputSubsystemSystem, eOutputLevelDebug, 0);
 
-   Task_Sleep(50); //sioks toks uzdelsimas prie inicializacija, nes be jo kartais ekranas neuzsiziebia
+   Task_Sleep(100); //sioks toks uzdelsimas prie inicializacija, nes be jo kartais ekranas neuzsiziebia
 
    u8g2_InitDisplay(&u8g2); //send init sequence to the display, display is in sleep mode
    u8g2_SetPowerSave(&u8g2,0); //wake up display

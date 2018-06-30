@@ -7,12 +7,14 @@
 
 struct Fifo_Command_Parser {
    char buffer[FIFO_COMMAND_PARSER_ITEMS][FIFO_COMMAND_PARSER_ITEM_SIZE];
-   int i_get, i_put, mtx_fifo_command_parser, smphr_count_items;
+   int i_get, i_put,
+       mtx_fifo_command_parser, smphr_count_items;
 };
 
 struct Fifo_Uart_Output {
    char *buffer[FIFO_UART_OUTPUT_ITEMS];
-   int i_get, i_put, mtx_fifo_uart_output, smphr_count_items, smphr_space_left, *smphr_finished[FIFO_UART_OUTPUT_ITEMS];
+   int i_get, i_put,
+       mtx_fifo_uart_output, smphr_count_items, smphr_space_left, *smphr_finished[FIFO_UART_OUTPUT_ITEMS];
 };
 
 /* ********** */

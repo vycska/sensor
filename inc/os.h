@@ -4,12 +4,12 @@
 #define NUMTHREADS	8      // number of threads
 
 struct tcb {
-   int *stack_pointer,
-       stack_size,
-       stack_base,
-       stack_maxusage,
-       *block,
-       sleep;
+   unsigned int *stack_pointer,
+                *stack_base;
+   int stack_size,
+       stack_usage,
+       sleep,
+       *block;
    char id,
         priority,
         *name;
