@@ -25,9 +25,9 @@ int config_load(void) {
    int i,o,total_size,result;
    for(total_size=0,i=0; i<sizeof(config_data)/sizeof(struct Config_Data); i++)
       total_size += config_data[i].size;
-   if(total_size == *((int*)p)) { //config'as geras, sprendziant pagal dydi (tik)
+   if(p[0]==CONFIG_VERSION && p[1]==total_size) { //config'as geras
       result = 0;
-      for(o=4,i=0; i<sizeof(config_data)/sizeof(struct Config_Data); o+=config_data[i++].size)
+      for(o=2,i=0; i<sizeof(config_data)/sizeof(struct Config_Data); o+=config_data[i++].size)
          memcpy(config_data[i].address_in_ram, p+o, config_data[i].size);
    }
    else result = 1;
@@ -38,9 +38,10 @@ void config_save(void) {
    char p[64];
    int i,o;
    memset(p,0xff,64);
-   for(o=4,i=0; i<sizeof(config_data)/sizeof(struct Config_Data); o+=config_data[i++].size)
+   for(o=2,i=0; i<sizeof(config_data)/sizeof(struct Config_Data); o+=config_data[i++].size)
       memcpy(p+o, config_data[i].address_in_ram, config_data[i].size);
-   *((int*)p) = o-4;
+   p[0] = CONFIG_VERSION;
+   p[1] = o-2; //konfigo dydis
    iap_erase_page(CONFIG_PAGE, CONFIG_PAGE);
    iap_copy_ram_to_flash(CONFIG_PAGE*64, (unsigned char*)p, 64);
 }

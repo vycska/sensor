@@ -10,32 +10,32 @@ struct BME280_Data bme280_data;
 int BME280_RegisterRead(unsigned int r, unsigned char *d, int l) {
    unsigned char reg[1];
    int ok;
-   struct I2C_Data i2c;
+   struct I2C_Data i2c_data;
 
-   i2c.slave = BME280_SLAVE;
-   i2c.direction = 2;        //write then read
+   i2c_data.slave = BME280_SLAVE;
+   i2c_data.direction = 2;        //write then read
    reg[0] = r;
-   i2c.buffer[0] = reg;
-   i2c.length[0] = 1;
-   i2c.buffer[1] = d;
-   i2c.length[1] = l;
-   ok = I2C_Transaction(0,&i2c);
+   i2c_data.buffer[0] = reg;
+   i2c_data.length[0] = 1;
+   i2c_data.buffer[1] = d;
+   i2c_data.length[1] = l;
+   ok = I2C_Transaction(0,&i2c_data);
    return ok;
 }
 
 int BME280_RegisterWrite(unsigned int r, unsigned char *d, int l) {
    unsigned char reg[1];
    int ok;
-   struct I2C_Data i2c;
+   struct I2C_Data i2c_data;
 
-   i2c.slave = BME280_SLAVE;
-   i2c.direction = 0;        //write
+   i2c_data.slave = BME280_SLAVE;
+   i2c_data.direction = 0;        //write
    reg[0] = r;
-   i2c.buffer[0] = reg;
-   i2c.length[0] = 1;
-   i2c.buffer[1] = d;
-   i2c.length[1] = l;
-   ok = I2C_Transaction(0,&i2c);
+   i2c_data.buffer[0] = reg;
+   i2c_data.length[0] = 1;
+   i2c_data.buffer[1] = d;
+   i2c_data.length[1] = l;
+   ok = I2C_Transaction(0,&i2c_data);
    return ok;
 }
 

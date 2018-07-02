@@ -25,10 +25,9 @@ void Task_Suspend(void);
 void Task_Sleep(int);
 void Task_Unsleep(struct tcb*);
 
-void Task_Suspend_Wait(int *);
 void Task_Spinning_Wait(int *);
 void Task_Spinning_Signal(int *);
-
+void Task_Suspend_Wait(int *);
 void Task_Blocking_Wait(int *);
 void Task_Blocking_Signal(int *);
 

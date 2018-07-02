@@ -78,17 +78,6 @@ void Task_Unsleep(struct tcb *task) {
    task->sleep = 0;
 }
 
-void Task_Suspend_Wait(int *s) {
-   DisableInterrupts();
-   while(*s <= 0) {
-      EnableInterrupts();
-      Task_Suspend();
-      DisableInterrupts();
-   }
-   *s -= 1;
-   EnableInterrupts();
-}
-
 void Task_Spinning_Wait(int *s) { //spinlock semaphore wait
    DisableInterrupts();
    while(*s <= 0) {
@@ -102,6 +91,17 @@ void Task_Spinning_Wait(int *s) { //spinlock semaphore wait
 void Task_Spinning_Signal(int *s) {
    DisableInterrupts();
    *s += 1;
+   EnableInterrupts();
+}
+
+void Task_Suspend_Wait(int *s) {
+   DisableInterrupts();
+   while(*s <= 0) {
+      EnableInterrupts();
+      Task_Suspend();
+      DisableInterrupts();
+   }
+   *s -= 1;
    EnableInterrupts();
 }
 
