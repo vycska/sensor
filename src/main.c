@@ -118,19 +118,18 @@ void main(void) {
 
    OS_Init(NUMTHREADS,
          "switch",            3,    576,     Task_Switch,
-         "uart_input",        3,    576,     Task_Uart_Input,
+         "uart_input",        3,    256,     Task_Uart_Input,
          "command_parser",    4,    576,     Task_Command_Parser,
          "bme280",            6,    576,     Task_BME280,
          "ds18b20",           6,    576,     Task_DS18B20,
          "oled",              7,    576,     Task_Oled,
-         "uart_output",       8,    576,     Task_Uart_Output,
-         "idle",              31,   256,     Task_Idle);
+         "uart_output",       8,    256,     Task_Uart_Output,
+         "idle",              31,   128,     Task_Idle);
    OS_Start();
 }
 
 void init(void) {
    char *dst, *src;
-
    //copy data to ram
    for(src = &_data_start_lma, dst = &_data_start; dst < &_data_end; src++, dst++)
       *dst = *src;

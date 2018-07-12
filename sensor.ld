@@ -64,7 +64,7 @@ SECTIONS
       _bss_end = .;
    } > ram
 
-   .heap (NOLOAD) : ALIGN(0x100)  {
+   .heap (NOLOAD) : ALIGN(0x10)  {
       end = .;
       _heap_start = end;
       . = ORIGIN(ram) + LENGTH(ram);
