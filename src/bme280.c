@@ -39,96 +39,109 @@ int BME280_RegisterWrite(unsigned int r, unsigned char *d, int l) {
    return ok;
 }
 
-void BME280_Init(void) {
-   unsigned char data[2] = { 0 };
+int BME280_Init(void) {
+   unsigned char data[2] = {0};
+   int result = 1;
 
-   bme280_data.os_h = bme280_data.os_p = bme280_data.os_t = 3;    // oversampling is x4 [but note value is 3]
-
-   data[0] = bme280_data.os_h;
-   BME280_RegisterWrite(0xf2, data, 1);
-
-   data[0] = (bme280_data.os_t << 5) | (bme280_data.os_p << 2);
-   BME280_RegisterWrite(0xf4, data, 1);
-
-   BME280_RegisterRead(0x88, data, 2);
+   //read compensation parameters
+   result = result && BME280_RegisterRead(0x88, data, 2);
    bme280_data.dig_T1 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x8a, data, 2);
+   result = result && BME280_RegisterRead(0x8a, data, 2);
    bme280_data.dig_T2 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x8c, data, 2);
+   result = result && BME280_RegisterRead(0x8c, data, 2);
    bme280_data.dig_T3 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x8e, data, 2);
+   result = result && BME280_RegisterRead(0x8e, data, 2);
    bme280_data.dig_P1 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x90, data, 2);
+   result = result && BME280_RegisterRead(0x90, data, 2);
    bme280_data.dig_P2 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x92, data, 2);
+   result = result && BME280_RegisterRead(0x92, data, 2);
    bme280_data.dig_P3 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x94, data, 2);
+   result = result && BME280_RegisterRead(0x94, data, 2);
    bme280_data.dig_P4 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x96, data, 2);
+   result = result && BME280_RegisterRead(0x96, data, 2);
    bme280_data.dig_P5 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x98, data, 2);
+   result = result && BME280_RegisterRead(0x98, data, 2);
    bme280_data.dig_P6 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x9a, data, 2);
+   result = result && BME280_RegisterRead(0x9a, data, 2);
    bme280_data.dig_P7 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x9c, data, 2);
+   result = result && BME280_RegisterRead(0x9c, data, 2);
    bme280_data.dig_P8 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0x9e, data, 2);
+   result = result && BME280_RegisterRead(0x9e, data, 2);
    bme280_data.dig_P9 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0xa1, data, 1);
+   result = result && BME280_RegisterRead(0xa1, data, 1);
    bme280_data.dig_H1 = data[0];
 
-   BME280_RegisterRead(0xe1, data, 2);
+   result = result && BME280_RegisterRead(0xe1, data, 2);
    bme280_data.dig_H2 = (data[1] << 8) | data[0];
 
-   BME280_RegisterRead(0xe3, data, 1);
+   result = result && BME280_RegisterRead(0xe3, data, 1);
    bme280_data.dig_H3 = data[0];
 
-   BME280_RegisterRead(0xe4, data, 2);
+   result = result && BME280_RegisterRead(0xe4, data, 2);
    bme280_data.dig_H4 = (data[0] << 4) | (data[1] & 0xf);
 
-   BME280_RegisterRead(0xe5, data, 2);
+   result = result && BME280_RegisterRead(0xe5, data, 2);
    bme280_data.dig_H5 = (data[1] << 4) | ((data[0] >> 4) & 0xf);
 
-   BME280_RegisterRead(0xe7, data, 1);
+   result = result && BME280_RegisterRead(0xe7, data, 1);
    bme280_data.dig_H6 = data[0];
-}
 
-void BME280_StartForcedMeasurement(void) {
-   unsigned char data[1];
+   //set oversampling rates
+   bme280_data.osrs_h = bme280_data.osrs_p = bme280_data.osrs_t = 5; // oversampling 2^(osrs-1), e.g. 2^(5-1)=16
 
-   data[0] = (bme280_data.os_t << 5) | (bme280_data.os_p << 2) | 1;
-   BME280_RegisterWrite(0xf4, data, 1);
-}
+   data[0] = bme280_data.osrs_h;
+   result = result && BME280_RegisterWrite(0xf2, data, 1);
 
-void BME280_GetValue(double *h, double *p, double *t) {
-   unsigned char data[8] = { 0 };
+   data[0] = (bme280_data.osrs_t << 5) | (bme280_data.osrs_p << 2);
+   result = result && BME280_RegisterWrite(0xf4, data, 1);
 
-   BME280_RegisterRead(0xf7, data, 8);
-   bme280_data.adc_P = (((unsigned int)data[0]) << 12) | (((unsigned int)data[1]) << 4) | (((unsigned int)data[2]) >> 4);
-   bme280_data.adc_T = (((unsigned int)data[3]) << 12) | (((unsigned int)data[4]) << 4) | (((unsigned int)data[5]) >> 4);
-   bme280_data.adc_H = (((unsigned int)data[6]) << 8) | ((unsigned int)data[7]);
-   bme280_data.T = BME280_compensate_T_int32(bme280_data.adc_T);
-   bme280_data.P = BME280_compensate_P_int64(bme280_data.adc_P);
-   bme280_data.H = BME280_compensate_H_int32(bme280_data.adc_H);
-   *h = (double)bme280_data.H / 1024.0;
-   *p = (double)bme280_data.P / 256.0 * 0.0075006;    //1 atm [standard atmosphere] = 760 torr = 101325 Pa = 1.01325 bar; 1 mmHg = 133.322387415 Pa --> 1 Pa = 0.0075006 mmHg
-   *t = (double)bme280_data.T / 100.0;
+   //set config
+   data[0] = (0<<2); //filter off
+   result = result && BME280_RegisterWrite(0xf5, data, 1);
+
+   return result;
 }
 
 int BME280_GetID(unsigned char *id) {
    return BME280_RegisterRead(0xd0, id, 1);
+}
+
+int BME280_StartForcedMeasurement(void) {
+   unsigned char data[1];
+   int result=1;
+
+   data[0] = bme280_data.osrs_h;
+   result = result && BME280_RegisterWrite(0xf2, data, 1);
+   data[0] = (bme280_data.osrs_t << 5) | (bme280_data.osrs_p << 2) | (1<<0);
+   result = result && BME280_RegisterWrite(0xf4, data, 1);
+   return result;
+}
+
+int BME280_ReadData(void) {
+   unsigned char data[8] = {0};
+   int result;
+
+   result = BME280_RegisterRead(0xf7, data, 8);
+   bme280_data.up = (data[0]<<12) | (data[1]<<4) | (data[2]>>4);
+   bme280_data.ut = (data[3]<<12) | (data[4]<<4) | (data[5]>>4);
+   bme280_data.uh = (data[6]<<8) | data[7];
+   bme280_data.ct = BME280_compensate_T_int32(bme280_data.ut);
+   bme280_data.cp = BME280_compensate_P_int64(bme280_data.up);
+   bme280_data.ch = BME280_compensate_H_int32(bme280_data.uh);
+
+   return result;
 }
 
 // Returns temperature in DegC, resolution is 0.01 DegC. Output value of 5123 equals 51.23 DegC.

@@ -26,7 +26,8 @@ struct Task_Oled_Data task_oled_data;
 
 void Task_Oled(void) {
    char buf[32],buf2[16];
-   double v;
+   int val_int;
+   double val_double;
 
    output("Task_Oled has started", eOutputSubsystemSystem, eOutputLevelDebug, 0);
 
@@ -48,8 +49,8 @@ void Task_Oled(void) {
             case 0:
                mysprintf(buf,"ds18b20: temper., %s","\xb0""C");
                if(task_ds18b20_data.temperature!=DS18B20_ERROR_VALUE) {
-                  v=task_ds18b20_data.temperature/100.0;
-                  mysprintf(buf2,"%f1",(char*)&v);
+                  val_double=task_ds18b20_data.temperature/100.0+0.05;
+                  mysprintf(buf2,"%f1",(char*)&val_double);
                }
                else
                   mysprintf(buf2,"**.*");
@@ -57,8 +58,8 @@ void Task_Oled(void) {
             case 1:
                mysprintf(buf,"bme280: temper., %s","\xb0""C");
                if(task_bme280_data.t != BME280_ERROR_VALUE) {
-                  v = task_bme280_data.t/100.0;
-                  mysprintf(buf2,"%f1",(char*)&v);
+                  val_double = task_bme280_data.t+0.05;
+                  mysprintf(buf2,"%f1",(char*)&val_double);
                }
                else
                   mysprintf(buf2,"**.*");
@@ -66,17 +67,17 @@ void Task_Oled(void) {
             case 2:
                mysprintf(buf,"bme280: dregme, %%");
                if(task_bme280_data.h != BME280_ERROR_VALUE) {
-                  v = task_bme280_data.h/100.0;
-                  mysprintf(buf2,"%f1",(char*)&v);
+                  val_int = task_bme280_data.h+0.5;
+                  mysprintf(buf2,"%d",val_int);
                }
                else
                   mysprintf(buf2,"**.*");
                break;
             case 3:
-               mysprintf(buf,"bme280: slegis, mmHg");
+               mysprintf(buf,"bme280: slegis, %s",task_bme280_data.units_p==1?"mmHg":"Pa");
                if(task_bme280_data.p != BME280_ERROR_VALUE) {
-                  v = task_bme280_data.p/100.0;
-                  mysprintf(buf2,"%f1",(char*)&v);
+                  val_int = task_bme280_data.p+0.5;
+                  mysprintf(buf2,"%d",val_int);
                }
                else
                   mysprintf(buf2,"**.*");
@@ -84,12 +85,12 @@ void Task_Oled(void) {
             case 4: //adc
 #if BOARD == BOARD_TEST
                mysprintf(buf, "2xAA baterijos, V");
-               v = ((double)adc_data.sum/adc_data.count)/4095.0*3.3;
+               val_double = ((double)adc_data.sum/adc_data.count)/4095.0*3.3;
 #elif BOARD == BOARD_RELEASE
                mysprintf(buf,"Li-Ion baterija, V");
-               v = ((double)adc_data.sum/adc_data.count)/4095.0*3.3 * 2;
+               val_double = ((double)adc_data.sum/adc_data.count)/4095.0*3.3 * 2;
 #endif
-               mysprintf(buf2,"%f2",(char*)&v);
+               mysprintf(buf2,"%f2",(char*)&val_double);
                break;
          }
          if(switch_data.active)
@@ -108,10 +109,13 @@ void Task_Oled(void) {
                   break;
             }
          u8g2_ClearBuffer(&u8g2);
+
          u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
-         u8g2_DrawStr(&u8g2,0,8,buf);
+         u8g2_DrawStr(&u8g2,MAX2(0,(128-u8g2_GetStrWidth(&u8g2,buf))/2),10,buf);
+
          u8g2_SetFont(&u8g2,u8g2_font_fur35_tn);
-         u8g2_DrawStr(&u8g2,2,62,buf2);
+         u8g2_DrawStr(&u8g2,MAX2(0,(128-u8g2_GetStrWidth(&u8g2,buf2))/2),58,buf2);
+
          u8g2_SendBuffer(&u8g2);
       }
 

@@ -4,7 +4,8 @@
 #define BME280_ERROR_VALUE (-10000)
 
 struct Task_BME280_Data {
-   int h, p, t;
+   int units_p;
+   double h, p, t;
 };
 
 void Task_BME280(void);
