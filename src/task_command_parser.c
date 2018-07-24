@@ -121,8 +121,7 @@ void Task_Command_Parser(void) {
             }
             break;
          case 0x7fb9: //units_p
-            if(params_count(params)==2)
-               task_bme280_data.units_p = params[2];
+            task_bme280_data.units_p ^= 1;
             break;
          case 0xa577: //bme280_config
             mysprintf(buf, "dig_T1: %d", (int)bme280_data.dig_T1);

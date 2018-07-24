@@ -32,18 +32,22 @@ void Task_Switch(void) {
          case 0:
             mysprintf(buf,"switch %d",switch_data.duration);
             output(buf, eOutputSubsystemSwitch, eOutputLevelDebug, 1);
-            switch(switch_data.duration/4000) {
+            switch(switch_data.duration/3000) {
                case 1:
-                  Fifo_Command_Parser_Put("led_enabled");
+                  Fifo_Command_Parser_Put("screen 0");
+                  Fifo_Command_Parser_Put("units_p");
                   break;
                case 2:
+                  Fifo_Command_Parser_Put("led_enabled");
+                  break;
+               case 3:
                   Fifo_Command_Parser_Put("screen 0");
                   Fifo_Command_Parser_Put("config_save");
                   break;
-               case 3:
+               case 4:
                   Fifo_Command_Parser_Put("uart_in_enabled");
                   break;
-               case 4:
+               case 5:
                   Fifo_Command_Parser_Put("log_enabled");
                   break;
             }

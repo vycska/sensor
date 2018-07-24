@@ -57,7 +57,7 @@ void Task_Oled(void) {
                break;
             case 1:
                mysprintf(buf,"bme280: temper., %s","\xb0""C");
-               if(task_bme280_data.t != BME280_ERROR_VALUE) {
+               if(task_bme280_data.ready) {
                   val_double = task_bme280_data.t+0.05;
                   mysprintf(buf2,"%f1",(char*)&val_double);
                }
@@ -66,7 +66,7 @@ void Task_Oled(void) {
                break;
             case 2:
                mysprintf(buf,"bme280: dregme, %%");
-               if(task_bme280_data.h != BME280_ERROR_VALUE) {
+               if(task_bme280_data.ready) {
                   val_int = task_bme280_data.h+0.5;
                   mysprintf(buf2,"%d",val_int);
                }
@@ -75,7 +75,7 @@ void Task_Oled(void) {
                break;
             case 3:
                mysprintf(buf,"bme280: slegis, %s",task_bme280_data.units_p==1?"mmHg":"Pa");
-               if(task_bme280_data.p != BME280_ERROR_VALUE) {
+               if(task_bme280_data.ready) {
                   val_int = task_bme280_data.p+0.5;
                   mysprintf(buf2,"%d",val_int);
                }
@@ -94,17 +94,20 @@ void Task_Oled(void) {
                break;
          }
          if(switch_data.active)
-            switch((millis-switch_data.start)/4000) {
+            switch((millis-switch_data.start)/3000) {
                case 1:
-                  mysprintf(buf,"LED");
+                  mysprintf(buf,"Pa/mmHg");
                   break;
                case 2:
-                  mysprintf(buf,"config");
+                  mysprintf(buf,"LED");
                   break;
                case 3:
-                  mysprintf(buf,"UART");
+                  mysprintf(buf,"config");
                   break;
                case 4:
+                  mysprintf(buf,"UART");
+                  break;
+               case 5:
                   mysprintf(buf,"log");
                   break;
             }
