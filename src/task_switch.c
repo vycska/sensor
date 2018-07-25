@@ -27,27 +27,30 @@ void Task_Switch(void) {
       Task_Blocking_Wait(&smphr_switch);
       switch(switch_data.active) {
          case 1:
-            Fifo_Command_Parser_Put("screen 1");
+            Fifo_Command_Parser_Put("screen");
             break;
          case 0:
             mysprintf(buf,"switch %d",switch_data.duration);
             output(buf, eOutputSubsystemSwitch, eOutputLevelDebug, 1);
-            switch(switch_data.duration/3000) {
+            switch(switch_data.duration/2000) {
                case 1:
-                  Fifo_Command_Parser_Put("screen 0");
                   Fifo_Command_Parser_Put("units_p");
+                  Fifo_Command_Parser_Put("screen 4");
                   break;
                case 2:
-                  Fifo_Command_Parser_Put("led_enabled");
+                  Fifo_Command_Parser_Put("p_base");
                   break;
                case 3:
+                  Fifo_Command_Parser_Put("led_enabled");
+                  break;
+               case 4:
                   Fifo_Command_Parser_Put("screen 0");
                   Fifo_Command_Parser_Put("config_save");
                   break;
-               case 4:
+               case 5:
                   Fifo_Command_Parser_Put("uart_in_enabled");
                   break;
-               case 5:
+               case 6:
                   Fifo_Command_Parser_Put("log_enabled");
                   break;
             }

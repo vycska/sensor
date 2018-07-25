@@ -3,6 +3,8 @@
 
 #include "u8g2.h"
 
+#define SCREENS 6
+
 struct Task_Oled_Data {
    unsigned char log_buffer[32*10];
    volatile int screen, log_enabled;

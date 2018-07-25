@@ -12,6 +12,7 @@
 #include "utils-asm.h"
 #include "utils.h"
 #include "lpc824.h"
+#include <math.h>
 
 extern volatile long long int millis;
 extern struct tcb *RunPt;
@@ -46,8 +47,10 @@ void Task_Oled(void) {
       }
       else {
          switch(task_oled_data.screen) {
-            case 0:
-               mysprintf(buf,"ds18b20: temper., %s","\xb0""C");
+            default:
+               task_oled_data.screen = 1;
+            case 1:
+               mysprintf(buf,"DS18B20: temper., %s","\xb0""C");
                if(task_ds18b20_data.temperature!=DS18B20_ERROR_VALUE) {
                   val_double=task_ds18b20_data.temperature/100.0+0.05;
                   mysprintf(buf2,"%f1",(char*)&val_double);
@@ -55,8 +58,8 @@ void Task_Oled(void) {
                else
                   mysprintf(buf2,"**.*");
                break;
-            case 1:
-               mysprintf(buf,"bme280: temper., %s","\xb0""C");
+            case 2:
+               mysprintf(buf,"BME280: temper., %s","\xb0""C");
                if(task_bme280_data.ready) {
                   val_double = task_bme280_data.t+0.05;
                   mysprintf(buf2,"%f1",(char*)&val_double);
@@ -64,8 +67,8 @@ void Task_Oled(void) {
                else
                   mysprintf(buf2,"**.*");
                break;
-            case 2:
-               mysprintf(buf,"bme280: dregme, %%");
+            case 3:
+               mysprintf(buf,"BME280: dregme, %%");
                if(task_bme280_data.ready) {
                   val_int = task_bme280_data.h+0.5;
                   mysprintf(buf2,"%d",val_int);
@@ -73,8 +76,8 @@ void Task_Oled(void) {
                else
                   mysprintf(buf2,"**.*");
                break;
-            case 3:
-               mysprintf(buf,"bme280: slegis, %s",task_bme280_data.units_p==1?"mmHg":"Pa");
+            case 4:
+               mysprintf(buf,"BME280: slegis, %s",task_bme280_data.units_p==1?"mmHg":"Pa");
                if(task_bme280_data.ready) {
                   val_int = task_bme280_data.p+0.5;
                   mysprintf(buf2,"%d",val_int);
@@ -82,7 +85,22 @@ void Task_Oled(void) {
                else
                   mysprintf(buf2,"**.*");
                break;
-            case 4: //adc
+            case 5:
+               if(task_bme280_data.base==0) {
+                  mysprintf(buf, "Aukstis, m");
+                  val_int = 44330.0 * (1.0-exp(1.0/5.255*log(task_bme280_data.p/101325.0))) + 0.5;
+                  mysprintf(buf2,"%d",val_int);
+               }
+               else {
+                  mysprintf(buf, "Delta z, m");
+                  val_double = 287.053 / 9.8 * (273.15+task_bme280_data.t) * log(task_bme280_data.p_base/task_bme280_data.p);
+                  val_int = (val_double<0.0); //ar reiksme neigiama [viso sito reikia, kad pries skaiciu butu - +]
+                  if(val_int) val_double = -val_double;
+                  val_double += 0.05; //suapvalinam, nes mysprintf() nukerta
+                  mysprintf(buf2,"%s%f1",val_int?"-":"+",(char*)&val_double);
+               }
+               break;
+            case 6: //adc
 #if BOARD == BOARD_TEST
                mysprintf(buf, "2xAA baterijos, V");
                val_double = ((double)adc_data.sum/adc_data.count)/4095.0*3.3;
@@ -94,20 +112,23 @@ void Task_Oled(void) {
                break;
          }
          if(switch_data.active)
-            switch((millis-switch_data.start)/3000) {
+            switch((millis-switch_data.start)/2000) {
                case 1:
                   mysprintf(buf,"Pa/mmHg");
                   break;
                case 2:
-                  mysprintf(buf,"LED");
+                  mysprintf(buf,"p_base");
                   break;
                case 3:
-                  mysprintf(buf,"config");
+                  mysprintf(buf,"LED");
                   break;
                case 4:
-                  mysprintf(buf,"UART");
+                  mysprintf(buf,"config");
                   break;
                case 5:
+                  mysprintf(buf,"UART");
+                  break;
+               case 6:
                   mysprintf(buf,"log");
                   break;
             }

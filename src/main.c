@@ -34,10 +34,10 @@ extern struct Task_Oled_Data task_oled_data;
 volatile long long int millis;
 
 void main(void) {
-   char buf[32];
-   int i, t;
+   //char buf[32];
+   //int i, t;
 
-   t = config_load();
+   //t = config_load();
 
    PDRUNCFG &= (~(1<<0 | 1<<1 | 1<<2 | 1<<4 | 1<<7)); //IRC output, IRC, flash, ADC, PLL powered
    SYSAHBCLKCTRL |= (1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<10 | 1<<14 | 1<<18 | 1<<21 | 1<<24); //enable clock for ROM, RAM0_1, FLASHREG, FLASH, I2C0, GPIO, SWM, MRT, USART0, IOCON, I2C1, ADC
@@ -59,6 +59,7 @@ void main(void) {
    u8log_SetCallback(&u8log, 0, &u8g2);
    u8log_SetRedrawMode(&u8log, 0);
 
+   /*
    for(i=0; i<=16; i++) {
       switch(i) {
          case 0:
@@ -115,6 +116,7 @@ void main(void) {
       }
       output(buf, eOutputSubsystemSystem, eOutputLevelImportant, -1);
    }
+   */
 
    OS_Init(NUMTHREADS,
          "switch",            3,    576,     Task_Switch,

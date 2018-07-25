@@ -83,8 +83,13 @@ void Task_Command_Parser(void) {
             }
             break;
          case 0x3f19: //output_mask
-            if(params_count(params)==3 && params[2]<eOutputSubsystemLast)
+            if(params_count(params)==2) {
+               for(i=0; i<(int)eOutputSubsystemLast; i++)
+                  output_data.mask[i] = params[2];
+            }
+            else if(params_count(params)==3 && params[2]<eOutputSubsystemLast) {
                output_data.mask[params[2]] = params[3];
+            }
             else {
                mysprintf(buf,"ADC %d",(int)eOutputSubsystemADC);
                output(buf, eOutputSubsystemSystem, eOutputLevelImportant, 1);
@@ -113,15 +118,24 @@ void Task_Command_Parser(void) {
             }
             break;
          case 0xcb6e: //screen
-            if(params_count(params)==2) {
-               if(params[2]==0)
-                  task_oled_data.screen = (5+task_oled_data.screen-1)%5;
-               else if(params[2]==1)
-                  task_oled_data.screen = (task_oled_data.screen+1)%5;
+            if(params_count(params)==1) {
+               task_oled_data.screen = task_oled_data.screen%SCREENS+1;
+            }
+            else if(params_count(params)==2) {
+               if(params[2]==0) {
+                  task_oled_data.screen -= 1;
+                  if(task_oled_data.screen==0) task_oled_data.screen = SCREENS;
+               }
+               else if(params[2]>=1 && params[2]<=SCREENS)
+                  task_oled_data.screen = params[2];
             }
             break;
          case 0x7fb9: //units_p
             task_bme280_data.units_p ^= 1;
+            break;
+         case 0x5b34: //p_base
+            task_bme280_data.base = 1;
+            task_bme280_data.p_base = task_bme280_data.p;
             break;
          case 0xa577: //bme280_config
             mysprintf(buf, "dig_T1: %d", (int)bme280_data.dig_T1);
