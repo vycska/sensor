@@ -43,18 +43,16 @@ void Task_BME280(void) {
       Task_Sleep(1.25 + 2.3 * power(2, bme280_data.osrs_t-1) + 2.3 * power(2, bme280_data.osrs_p-1) + 0.575 + 2.3 * power(2, bme280_data.osrs_h-1) + 0.575);
       result = BME280_ReadData();
       if(result==1) {
-         task_bme280_data.ready = 1;
          task_bme280_data.t = bme280_data.ct/100.0;
          task_bme280_data.h = bme280_data.ch/1024.0;
-         task_bme280_data.p = bme280_data.cp/256.0;
-         if(task_bme280_data.units_p==1)
-            task_bme280_data.p *= 0.0075006; //1 atm [standard atmosphere] = 760 torr = 101325 Pa = 1.01325 bar; 1 mmHg = 133.322387415 Pa --> 1 Pa = 0.0075006 mmHg
-
+         task_bme280_data.p = bme280_data.cp/256.0*PA2MMHG;
+         if(task_bme280_data.pbase==0) task_bme280_data.pbase = task_bme280_data.p;
+         task_bme280_data.ready = 1;
          mysprintf(s, "bme280 t: %f2 C", (char *)&task_bme280_data.t);
          output(s, eOutputSubsystemBME280, eOutputLevelDebug, 1);
          mysprintf(s, "bme280 h: %f2 %%", (char *)&task_bme280_data.h);
          output(s, eOutputSubsystemBME280, eOutputLevelDebug, 1);
-         mysprintf(s, "bme280 p: %f2 %s", (char *)&task_bme280_data.p,task_bme280_data.units_p==1?"mmHg":"Pa");
+         mysprintf(s, "bme280 p: %f2 mmHg", (char *)&task_bme280_data.p);
          output(s, eOutputSubsystemBME280, eOutputLevelDebug, 1);
       }
       else {

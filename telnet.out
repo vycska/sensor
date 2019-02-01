@@ -1,0 +1,57 @@
+adapter speed: 1000 kHz
+jlink
+exec
+AP ID register 0x04770031
+	Type is MEM-AP AHB
+MEM-AP BASE 0xf0000003
+	Valid ROM table present
+		Component base address 0xf0000000
+		Peripheral ID 0x0500081000
+		Designer is 0x581, Specular Networks
+		Part is 0x0, Unrecognized 
+		Component class is 0x1, ROM table
+		MEMTYPE system memory present on bus
+	ROMTABLE[0x0] = 0x24000003
+		Component base address 0x14000000
+		Invalid CID 0x00000000
+	ROMTABLE[0x4] = 0xf00ff003
+		Component base address 0xe00ff000
+		Peripheral ID 0x04000bb4c0
+		Designer is 0x4bb, ARM Ltd.
+		Part is 0x4c0, Cortex-M0+ ROM (ROM Table)
+		Component class is 0x1, ROM table
+		MEMTYPE system memory present on bus
+	[L01] ROMTABLE[0x0] = 0xfff0f003
+		Component base address 0xe000e000
+		Peripheral ID 0x04000bb008
+		Designer is 0x4bb, ARM Ltd.
+		Part is 0x8, Cortex-M0 SCS (System Control Space)
+		Component class is 0xe, Generic IP component
+	[L01] ROMTABLE[0x4] = 0xfff02003
+		Component base address 0xe0001000
+		Peripheral ID 0x04000bb00a
+		Designer is 0x4bb, ARM Ltd.
+		Part is 0xa, Cortex-M0 DWT (Data Watchpoint and Trace)
+		Component class is 0xe, Generic IP component
+	[L01] ROMTABLE[0x8] = 0xfff03003
+		Component base address 0xe0002000
+		Peripheral ID 0x04000bb00b
+		Designer is 0x4bb, ARM Ltd.
+		Part is 0xb, Cortex-M0 BPU (Breakpoint Unit)
+		Component class is 0xe, Generic IP component
+	[L01] ROMTABLE[0xc] = 0x0
+	[L01] 	End of ROM table
+	ROMTABLE[0x8] = 0x0
+		End of ROM table
+#0 : lpc824.flash (lpc2000) at 0x00000000, size 0x00008000, buswidth 0, chipwidth 0
+flash 'lpc2000' found at 0x00000000
+lpc2000 part id: 0x00008242
+Unsupported Command
+962810692
+962816608
+Info : failed
+
+trace history buffer is not allocated
+resume [address]
+Open On-Chip Debugger 0.10.0
+Info : dropped 'telnet' connection

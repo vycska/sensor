@@ -130,12 +130,8 @@ void Task_Command_Parser(void) {
                   task_oled_data.screen = params[2];
             }
             break;
-         case 0x7fb9: //units_p
-            task_bme280_data.units_p ^= 1;
-            break;
          case 0x5b34: //p_base
-            task_bme280_data.base = 1;
-            task_bme280_data.p_base = task_bme280_data.p;
+            task_bme280_data.pbase = task_bme280_data.p;
             break;
          case 0xa577: //bme280_config
             mysprintf(buf, "dig_T1: %d", (int)bme280_data.dig_T1);

@@ -77,7 +77,7 @@ void Task_Oled(void) {
                   mysprintf(buf2,"**.*");
                break;
             case 4:
-               mysprintf(buf,"BME280: slegis, %s",task_bme280_data.units_p==1?"mmHg":"Pa");
+               mysprintf(buf,"BME280: slegis, mmHg");
                if(task_bme280_data.ready) {
                   val_int = task_bme280_data.p+0.5;
                   mysprintf(buf2,"%d",val_int);
@@ -86,19 +86,12 @@ void Task_Oled(void) {
                   mysprintf(buf2,"**.*");
                break;
             case 5:
-               if(task_bme280_data.base==0) {
-                  mysprintf(buf, "Aukstis, m");
-                  val_int = 44330.0 * (1.0-exp(1.0/5.255*log(task_bme280_data.p/101325.0))) + 0.5;
-                  mysprintf(buf2,"%d",val_int);
-               }
-               else {
-                  mysprintf(buf, "Delta z, m");
-                  val_double = 287.053 / 9.8 * (273.15+task_bme280_data.t) * log(task_bme280_data.p_base/task_bme280_data.p);
-                  val_int = (val_double<0.0); //ar reiksme neigiama [viso sito reikia, kad pries skaiciu butu - +]
-                  if(val_int) val_double = -val_double;
-                  val_double += 0.05; //suapvalinam, nes mysprintf() nukerta
-                  mysprintf(buf2,"%s%f1",val_int?"-":"+",(char*)&val_double);
-               }
+               mysprintf(buf, "Delta z, m");
+               val_double = 287.053 / 9.8 * (273.15+task_bme280_data.t) * log(task_bme280_data.pbase/task_bme280_data.p);
+               val_int = (val_double<0.0); //ar reiksme neigiama [viso sito reikia, kad pries skaiciu butu - +]
+               if(val_int) val_double = -val_double;
+               val_double += 0.05; //suapvalinam, nes mysprintf() nukerta
+               mysprintf(buf2,"%s%f1",val_int?"-":"+",(char*)&val_double);
                break;
             case 6: //adc
 #if BOARD == BOARD_TEST
@@ -114,21 +107,18 @@ void Task_Oled(void) {
          if(switch_data.active)
             switch((millis-switch_data.start)/2000) {
                case 1:
-                  mysprintf(buf,"Pa/mmHg");
+                  mysprintf(buf,"pbase");
                   break;
                case 2:
-                  mysprintf(buf,"p_base");
-                  break;
-               case 3:
                   mysprintf(buf,"LED");
                   break;
-               case 4:
+               case 3:
                   mysprintf(buf,"config");
                   break;
-               case 5:
+               case 4:
                   mysprintf(buf,"UART");
                   break;
-               case 6:
+               case 5:
                   mysprintf(buf,"log");
                   break;
             }

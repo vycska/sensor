@@ -1,0 +1,106 @@
+$ telnet -4 localhost 4444
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+Open On-Chip Debugger
+
+> interface_list
+The following debug interfaces are available:
+1: parport
+2: dummy
+3: ftdi
+4: usb_blaster
+5: jtag_vpi
+6: amt_jtagaccel
+7: gw16012
+8: presto
+9: usbprog
+10: openjtag
+11: jlink
+12: vsllink
+13: rlink
+14: ulink
+15: arm-jtag-ew
+16: buspirate
+17: remote_bitbang
+18: hla
+19: osbdm
+20: opendous
+21: aice
+22: cmsis-dap
+
+> adapter_name
+jlink
+
+> transport list
+The following transports are available:
+   stlink_swim
+   hla_jtag
+   hla_swd
+   swd
+   aice_jtag
+   jtag
+
+> targets
+0*  lpc824.cpu  cortex_m  little  lpc824.cpu  halted
+
+> flash banks
+#0 : lpc824.flash (lpc2000) at 0x00000000, size 0x00008000, buswidth 0, chipwidth 0
+
+> flash probe 0
+flash 'lpc2000' found at 0x00000000
+
+> flash info 0
+#0 : lpc2000 at 0x00000000, size 0x00008000, buswidth 0, chipwidth 0
+   #  0: 0x00000000 (0x400 1kB) protected
+   #  1: 0x00000400 (0x400 1kB) protected
+   ...
+   # 31: 0x00007c00 (0x400, 1kB) protected
+lpc2000 flash driver variant: 4, clk: 12000kHz
+
+> flash erase_sector 0 0 last
+
+> flash fillw 0x0 0x10000160 1
+
+> flash read_bank 0 rom.img 0 64
+wrote 64 bytes to file rom.img from flash bank 0 at offset 0x00000000 in 0.003009s (20.771 KiB/s)
+
+> flash write_image erase unlock sensor.elf 0 elf
+auto erase enabled
+auto unlock enabled
+wrote 32768 bytes from file sensor.elf in 2.788664s (11.475 KiB/s)
+
+> halt
+
+> reg
+===== arm v7m registers
+(0) r0 (/32): 0xFFFFFFFF
+...
+(22) control (/2): 0x00
+===== Cortex-M DWT registers
+(23) dwt)ctrl (/32)
+...
+(30) dwt_1_function (/32)
+
+> mdw 0x10000000 8
+0x10000000: 81411eb1 4988620d 2811ab10 680000b6 10e48ab9 4a601412 08842f49 88c41d46
+
+> dump_image flash.img 0x10000000 128
+
+> bp #lists all active breakpoints
+
+> wp #lists all active watchpoints
+
+> arm disassemble 0x13c 2
+0x0000013c  0xa903   ADD   r1, SP, #0xc
+0x0000013e  0x980c   LDR   r0, [SP, #0x30]
+
+> cortex_m vector_catch all
+
+> cortex_m reset_config vectreset #use NVIC VECTRESET to reset system
+
+> exit
+
+=======================================
+
+# -c "shutdown" #close the OpenOCD server
