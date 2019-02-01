@@ -62,10 +62,10 @@ void MRT_IRQHandler(void) {
          if(Switch_Pressed()) {
             switch_data.delay = 0;
          }
-         else if(++switch_data.delay==500) {
+         else if(++switch_data.delay==200) {
             switch_data.active = 0;
             switch_data.delay = 0;
-            switch_data.duration = millis-switch_data.start-500;
+            switch_data.duration = millis-switch_data.start-200;
             Task_Blocking_Signal(&smphr_switch);
          }
       }

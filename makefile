@@ -81,7 +81,7 @@ picocom :
 	picocom -b 38400 --echo /dev/ttyUSB0
 
 tags :
-	ctags -R --extra=+f *
+	ctags -R --extras=+f *
 	find . -name '*.[csh]' > cscope.files
 	cscope -q -R -b -i cscope.files
 
