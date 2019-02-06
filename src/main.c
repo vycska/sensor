@@ -53,8 +53,15 @@ void main(void) {
    Fifo_Uart_Output_Init();
    Fifo_Command_Parser_Init();
 
-   //u8g2_Setup_ssd1306_i2c_128x64_noname_f(&task_oled_data.u8g2,U8G2_R0,u8x8_byte_sw_i2c,u8x8_gpio_and_delay_sw); //init u8g2 structure
-   u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2, U8G2_R0, u8x8_byte_hw_i2c, u8x8_gpio_and_delay_hw); //su hardware'iniu i2c
+#if OLED_COMMUNICATION == I2C_SW
+   u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2,U8G2_R0,u8x8_byte_sw_i2c,u8x8_gpio_and_delay);
+#elif OLED_COMMUNICATION == I2C_HW
+   u8g2_Setup_ssd1306_i2c_128x64_noname_f(&u8g2, U8G2_R0, u8x8_byte_hw_i2c, u8x8_gpio_and_delay);
+#elif OLED_COMMUNICATION == SPI_SW
+   u8g2_Setup_ssd1306_128x64_noname_f(&u8g2, U8G2_R0, u8x8_byte_4wire_sw_spi, u8x8_gpio_and_delay);
+#elif OLED_COMMUNICATION == SPI_HW
+
+#endif
    u8log_Init(&u8log, 32, 10, task_oled_data.log_buffer);
    u8log_SetCallback(&u8log, 0, &u8g2);
    u8log_SetRedrawMode(&u8log, 0);
@@ -118,13 +125,13 @@ void main(void) {
 
    OS_Init(NUMTHREADS,
          "switch",            3,    576,     Task_Switch,
-         "uart_input",        3,    256,     Task_Uart_Input,
+         "uart_input",        3,    384,     Task_Uart_Input,
          "command_parser",    4,    576,     Task_Command_Parser,
          "bme280",            6,    576,     Task_BME280,
          "ds18b20",           6,    576,     Task_DS18B20,
          "oled",              7,    576,     Task_Oled,
-         "uart_output",       8,    256,     Task_Uart_Output,
-         "idle",              31,   128,     Task_Idle);
+         "uart_output",       8,    384,     Task_Uart_Output,
+         "idle",              31,   256,     Task_Idle);
    OS_Start();
 }
 

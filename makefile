@@ -75,7 +75,7 @@ cleanall : clean
 	rm -rf libs
 
 install : all
-	~/bin/lpc21isp $(TARGET).hex /dev/ttyUSB0 115200 12000
+	~/bin/lpc21isp -donotstart -verify -bin $(TARGET).bin /dev/ttyUSB0 115200 12000
 
 picocom :
 	picocom -b 38400 --echo /dev/ttyUSB0

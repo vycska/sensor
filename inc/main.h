@@ -6,6 +6,6 @@
 
 #define BOARD_TEST 0
 #define BOARD_RELEASE 1
-#define BOARD BOARD_RELEASE
+#define BOARD BOARD_TEST
 
 #endif
