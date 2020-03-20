@@ -7,30 +7,30 @@ TARGET := sensor
 DEBUG := 0
 OPTIM := O1
 
-ASRCS := $(sort $(shell find . -name '*.s' -printf '%f '))
+ASRCS := $(sort $(shell find . -path ./src/u8g2 -prune -o -name '*.s' -printf '%f '))
 AOBJS := $(addprefix objs/,$(ASRCS:.s=.o))
 
 CSRCS := $(sort $(shell find src -path src/u8g2 -prune -o -name '*.c' -printf '%f '))
 CDEPS := $(patsubst %.c,deps/%.d,$(CSRCS))
 COBJS := $(addprefix objs/,$(CSRCS:.c=.o))
 
-U8G2SRCS := $(sort $(shell find src/u8g2 -name '*.c' -printf '%f '))
+U8G2SRCS := $(sort $(shell find src/u8g2/csrc -name '*.c' -printf '%f '))
 U8G2DEPS := $(patsubst %.c,deps/%.d,$(U8G2SRCS))
 U8G2OBJS := $(addprefix objs/,$(U8G2SRCS:.c=.o))
 
 ASFLAGS := -Wa,--warn -Wa,--fatal-warnings
-CPPFLAGS := -I inc -I inc/u8g2 -I /usr/arm-none-eabi/include
+CPPFLAGS := -I inc -I src/u8g2/csrc -I /usr/arm-none-eabi/include -I /usr/lib/gcc/arm-none-eabi/9.2.0/include
 CFLAGS := -march=armv6-m -mcpu=cortex-m0plus -mthumb -mfloat-abi=soft -mlittle-endian -ffreestanding -fsigned-char -fdata-sections -ffunction-sections -Wall -Werror -$(OPTIM)
-LDFLAGS := -nostdlib -nostartfiles -nodefaultlibs -Llibs -L/usr/arm-none-eabi/lib/thumb/v6-m/nofp -L/usr/lib/gcc/arm-none-eabi/8.2.0/thumb/v6-m/nofp -T $(TARGET).ld -Wl,-Map=$(TARGET).map -Wl,--cref -Wl,--gc-sections -Wl,--print-memory-usage -Wl,--stats
+LDFLAGS := -nostdlib -nostartfiles -nodefaultlibs -Llibs -L/usr/arm-none-eabi/lib/thumb/v6-m/nofp -L/usr/lib/gcc/arm-none-eabi/9.2.0/thumb/v6-m/nofp -T $(TARGET).ld -Wl,-Map=$(TARGET).map -Wl,--cref -Wl,--gc-sections -Wl,--print-memory-usage -Wl,--stats -Wl,--print-output-form
 LDLIBS := -lu8g2 -lm -lgcc -lc_nano -lnosys
 
 ifeq ($(DEBUG),1)
    CFLAGS += -g
 endif
 
-vpath %.h inc:inc/u8g2
+vpath %.h inc:src/u8g2/csrc
 vpath %.s src
-vpath %.c src:src/u8g2
+vpath %.c src:src/u8g2/csrc
 
 $(shell if [ ! -d deps ]; then mkdir -p deps; fi)
 $(shell if [ ! -d objs ]; then mkdir -p objs; fi)
