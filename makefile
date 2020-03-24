@@ -69,7 +69,7 @@ libs/libu8g2.a : $(U8G2OBJS)
 	arm-none-eabi-ar -rcsDv --target=elf32-littlearm $@ $^
 
 clean :
-	rm -rf *.o *.elf *.bin *.hex *.map *.lst *.png cscope* tags deps objs
+	rm -rf *.d *.o *.bin *.hex *.elf *.lst *.map *.png *cscope* *tags* deps objs
 
 cleanall : clean
 	rm -rf libs
@@ -81,8 +81,13 @@ picocom :
 	picocom -b 38400 --echo /dev/ttyUSB0
 
 tags :
-	ctags -R --extras=+f *
-	find . -name '*.[csh]' > cscope.files
+	find . -path './src/u8g2' -prune -o -name '*.[csh]' -printf '%h/%f ' > ctags.files
+	find . -path './src/u8g2' -prune -o -name '*.cpp' -printf '%h/%f  ' >> ctags.files
+	find . -path './src/u8g2' -prune -o -name '*.ld' -printf '%h/%f ' >> ctags.files
+	find . -path './src/u8g2' -prune -o -name 'makefile' -printf '%h/%f ' >> ctags.files
+	find ./src/u8g2/csrc -name '*' -a -type 'f' -printf '%h/%f ' >> ctags.files
+	ctags --extras=+f `cat ctags.files`
+	cat ctags.files | tr ' ' '\n' > cscope.files
 	cscope -q -R -b -i cscope.files
 
 board_images : board_front.png board_back.png
